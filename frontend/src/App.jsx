@@ -3,39 +3,40 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { SearchProvider } from './context/SearchContext';
 import { WishlistProvider } from './context/WishlistContext';
-import Index from './pages/Index';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Dashboard from './pages/Dashboard';
-import VendorDashboard from './pages/VendorDashboard';
-import AdminDashboard from './pages/AdminDashboard';
-import Cart from './pages/Cart';
-import ProductDetail from './pages/ProductDetail';
-import Address from './pages/Address';
-import Payment from './pages/Payment';
-import OrderSuccess from './pages/OrderSuccess';
-import Terms from './pages/Terms';
-import About from './pages/About';
-import Contact from './pages/Contact';
-import VendorOrders from './pages/VendorOrders';
-import VendorProfile from './pages/VendorProfile';
-import VendorNewOrder from './pages/VendorNewOrder';
-import VendorInvoice from './pages/VendorInvoice';
-import VendorProduct from './pages/VendorProduct';
+import Index from './legacy-pages/Index';
+import Login from './legacy-pages/Login';
+import Signup from './legacy-pages/Signup';
+import ForgotPassword from './legacy-pages/ForgotPassword';
+import ResetPassword from './legacy-pages/ResetPassword';
+import VerifyEmail from './legacy-pages/VerifyEmail';
+import Dashboard from './legacy-pages/Dashboard';
+import VendorDashboard from './legacy-pages/VendorDashboard';
+import AdminDashboard from './legacy-pages/AdminDashboard';
+import Cart from './legacy-pages/Cart';
+import ProductDetail from './legacy-pages/ProductDetail';
+import Address from './legacy-pages/Address';
+import Payment from './legacy-pages/Payment';
+import OrderSuccess from './legacy-pages/OrderSuccess';
+import Terms from './legacy-pages/Terms';
+import About from './legacy-pages/About';
+import Contact from './legacy-pages/Contact';
+import VendorOrders from './legacy-pages/VendorOrders';
+import VendorProfile from './legacy-pages/VendorProfile';
+import VendorNewOrder from './legacy-pages/VendorNewOrder';
+import VendorInvoice from './legacy-pages/VendorInvoice';
+import VendorProduct from './legacy-pages/VendorProduct';
 import { lazy, Suspense } from 'react';
-const VendorReports = lazy(() => import('./pages/VendorReports'));
-const VendorSettings = lazy(() => import('./pages/VendorSettings'));
-const VendorProducts = lazy(() => import('./pages/VendorProducts'));
-const AdminOrders = lazy(() => import('./pages/AdminOrders'));
-const AdminProducts = lazy(() => import('./pages/AdminProducts'));
-const AdminUsers = lazy(() => import('./pages/AdminUsers'));
-const AdminReports = lazy(() => import('./pages/AdminReports'));
-const AdminSettings = lazy(() => import('./pages/AdminSettings'));
-import CustomerDashboard from './pages/customer/CustomerDashboard';
-import CustomerOrders from './pages/customer/CustomerOrders';
-import CustomerOrderDetail from './pages/customer/CustomerOrderDetail';
+const VendorReports = lazy(() => import('./legacy-pages/VendorReports'));
+const VendorSettings = lazy(() => import('./legacy-pages/VendorSettings'));
+const VendorProducts = lazy(() => import('./legacy-pages/VendorProducts'));
+const AdminOrders = lazy(() => import('./legacy-pages/AdminOrders'));
+const AdminProducts = lazy(() => import('./legacy-pages/AdminProducts'));
+const AdminUsers = lazy(() => import('./legacy-pages/AdminUsers'));
+const AdminReports = lazy(() => import('./legacy-pages/AdminReports'));
+const AdminSettings = lazy(() => import('./legacy-pages/AdminSettings'));
+import CustomerDashboard from './legacy-pages/customer/CustomerDashboard';
+import CustomerOrders from './legacy-pages/customer/CustomerOrders';
+import CustomerOrderDetail from './legacy-pages/customer/CustomerOrderDetail';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
     const { user, loading } = useAuth();
@@ -82,6 +83,7 @@ function App() {
                                     <Route path="/signup" element={<Signup />} />
                                     <Route path="/forgot-password" element={<ForgotPassword />} />
                                     <Route path="/reset-password" element={<ResetPassword />} />
+                                    <Route path="/verify-email" element={<VerifyEmail />} />
                                     <Route
                                         path="/cart"
                                         element={

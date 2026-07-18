@@ -1,6 +1,25 @@
 const prisma = require('../config/db');
+const crypto = require('crypto');
 const { hashPassword, comparePassword, generateToken, generateResetToken, verifyToken } = require('../utils/auth');
 const couponService = require('./couponService');
+
+const EMAIL_VERIFICATION_TTL_MS = 10 * 60 * 1000;
+
+const createEmailVerificationCode = async (userId) => {
+    const code = crypto.randomInt(100000, 1000000).toString();
+    const tokenHash = crypto.createHash('sha256').update(`${userId}:${code}`).digest('hex');
+    const expiresAt = new Date(Date.now() + EMAIL_VERIFICATION_TTL_MS);
+
+    await prisma.user.update({
+        where: { id: userId },
+        data: {
+            emailVerificationTokenHash: tokenHash,
+            emailVerificationExpiresAt: expiresAt,
+        },
+    });
+
+    return code;
+};
 
 const signup = async (userData) => {
     const { name, email, companyName, gstin, password, role, vendorCategory, couponCode } = userData;
@@ -40,10 +59,8 @@ const signup = async (userData) => {
         couponApplied = true;
     }
 
-    const token = generateToken(user.id, user.role);
-
     const { password: _, ...userWithoutPassword } = user;
-    return { user: userWithoutPassword, token, couponApplied };
+    return { user: userWithoutPassword, couponApplied };
 };
 
 const login = async (email, password) => {
@@ -61,10 +78,54 @@ const login = async (email, password) => {
         throw new Error('Invalid email or password');
     }
 
+    if (!user.emailVerified) {
+        const verificationCode = await createEmailVerificationCode(user.id);
+        return {
+            requiresEmailVerification: true,
+            email: user.email,
+            verificationCode,
+        };
+    }
+
     const token = generateToken(user.id, user.role);
 
     const { password: _, ...userWithoutPassword } = user;
     return { user: userWithoutPassword, token };
+};
+
+const verifyEmail = async (email, code) => {
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    const normalizedCode = String(code || '').trim();
+    if (!normalizedEmail || !/^\d{6}$/.test(normalizedCode)) {
+        throw new Error('Enter a valid six-digit verification code');
+    }
+
+    const user = await prisma.user.findFirst({
+        where: {
+            email: { equals: normalizedEmail, mode: 'insensitive' },
+        },
+    });
+
+    if (!user || !user.emailVerificationTokenHash || !user.emailVerificationExpiresAt || user.emailVerificationExpiresAt <= new Date()) {
+        throw new Error('The verification code is invalid or expired. Sign in again to receive a new code.');
+    }
+
+    const codeHash = crypto.createHash('sha256').update(`${user.id}:${normalizedCode}`).digest('hex');
+    if (!crypto.timingSafeEqual(Buffer.from(codeHash), Buffer.from(user.emailVerificationTokenHash))) {
+        throw new Error('The verification code is invalid or expired.');
+    }
+
+    const verifiedUser = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            emailVerified: true,
+            emailVerificationTokenHash: null,
+            emailVerificationExpiresAt: null,
+        },
+    });
+
+    const { password: _, ...userWithoutPassword } = verifiedUser;
+    return userWithoutPassword;
 };
 
 /**
@@ -121,6 +182,7 @@ const resetPassword = async (token, newPassword) => {
 module.exports = {
     signup,
     login,
+    verifyEmail,
     getMe,
     forgotPassword,
     resetPassword,

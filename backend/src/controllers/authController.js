@@ -32,6 +32,36 @@ const login = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email and password are required' });
         }
         const result = await authService.login(email, password);
+
+        if (result.requiresEmailVerification) {
+            try {
+                await sendEmail({
+                    email: result.email,
+                    subject: 'Your RentFlow verification code',
+                    message: `Your RentFlow verification code is ${result.verificationCode}. It expires in 10 minutes.`,
+                    html: `
+                        <h1>Verify your email</h1>
+                        <p>Use this code to verify your RentFlow account:</p>
+                        <p style="font-size: 28px; font-weight: 700; letter-spacing: 6px;">${result.verificationCode}</p>
+                        <p>This code expires in 10 minutes. Do not share it with anyone.</p>
+                    `,
+                });
+            } catch (emailError) {
+                console.error('Verification email error:', emailError.message);
+                return res.status(503).json({
+                    success: false,
+                    message: 'Email verification is unavailable. Configure SMTP settings and try again.',
+                });
+            }
+
+            return res.status(403).json({
+                success: false,
+                requiresEmailVerification: true,
+                email: result.email,
+                message: 'Enter the six-digit code sent to your email.',
+            });
+        }
+
         res.status(200).json({
             success: true,
             message: 'Login successful',
@@ -47,6 +77,19 @@ const login = async (req, res) => {
             ? 'Database is not available. Run migrations and check DATABASE_URL.'
             : msg;
         return res.status(status).json({ success: false, message });
+    }
+};
+
+const verifyEmail = async (req, res) => {
+    try {
+        const { email, code } = req.body || {};
+        await authService.verifyEmail(email, code);
+        return res.status(200).json({
+            success: true,
+            message: 'Email verified. You can now sign in.',
+        });
+    } catch (error) {
+        return res.status(400).json({ success: false, message: error.message });
     }
 };
 
@@ -163,6 +206,7 @@ const resetPassword = async (req, res) => {
 module.exports = {
     register,
     login,
+    verifyEmail,
     getMe,
     forgotPassword,
     resetPassword,

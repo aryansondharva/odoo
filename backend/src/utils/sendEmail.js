@@ -1,6 +1,12 @@
 const nodemailer = require('nodemailer');
 
 const sendEmail = async (options) => {
+    const requiredSettings = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_EMAIL', 'SMTP_PASSWORD'];
+    const missingSettings = requiredSettings.filter((key) => !process.env[key]);
+    if (missingSettings.length) {
+        throw new Error(`Missing email configuration: ${missingSettings.join(', ')}`);
+    }
+
     // Create a transporter
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -17,7 +23,7 @@ const sendEmail = async (options) => {
 
     // Define the email options
     const mailOptions = {
-        from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
+        from: `${process.env.FROM_NAME || 'RentFlow'} <${process.env.FROM_EMAIL || process.env.SMTP_EMAIL}>`,
         to: options.email,
         subject: options.subject,
         text: options.message,

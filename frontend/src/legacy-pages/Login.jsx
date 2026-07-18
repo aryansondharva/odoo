@@ -40,6 +40,8 @@ const Login = () => {
 
         if (result.success) {
             navigate('/dashboard');
+        } else if (result.requiresEmailVerification) {
+            navigate('/verify-email', { state: { email: result.email, message: result.message } });
         } else {
             setErrors({ server: result.message });
         }

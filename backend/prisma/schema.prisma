@@ -24,6 +24,9 @@ model User {
   gstin           String?
   password        String
   role            Role     @default(CUSTOMER)
+  emailVerified   Boolean  @default(false)
+  emailVerificationTokenHash String?
+  emailVerificationExpiresAt DateTime?
   vendorCategory  String?  // Electronics, Furniture, etc.
   phone           String?
   address         String?

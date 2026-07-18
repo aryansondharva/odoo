@@ -38,7 +38,21 @@ export const AuthProvider = ({ children }) => {
             return { success: true };
         } catch (error) {
             const msg = error.response?.data?.message || error.message || 'Login failed';
-            return { success: false, message: msg };
+            return {
+                success: false,
+                message: msg,
+                requiresEmailVerification: error.response?.data?.requiresEmailVerification === true,
+                email: error.response?.data?.email || email,
+            };
+        }
+    };
+
+    const verifyEmail = async (email, code) => {
+        try {
+            const response = await axios.post('http://localhost:5000/api/auth/verify-email', { email, code });
+            return { success: response.data?.success === true, message: response.data?.message };
+        } catch (error) {
+            return { success: false, message: error.response?.data?.message || 'Verification failed' };
         }
     };
 
@@ -71,7 +85,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, signup, logout, loading, updateUser }}>
+        <AuthContext.Provider value={{ user, login, signup, verifyEmail, logout, loading, updateUser }}>
             {children}
         </AuthContext.Provider>
     );
