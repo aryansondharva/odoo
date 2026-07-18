@@ -1,13 +1,11 @@
-import express from 'express'
-import { getProfile, updateProfile, changePassword } from '../controllers/profile.controller.js'
-import { authenticate } from '../middleware/auth.middleware.js'
-import { validate } from '../middleware/validate.middleware.js'
-import { updateProfileSchema, changePasswordSchema } from '../validations/profile.validations.js'
-
-const router = express.Router()
-
-router.get('/', authenticate, getProfile)
-router.put('/', authenticate, validate(updateProfileSchema), updateProfile)
-router.put('/password', authenticate, validate(changePasswordSchema), changePassword)
-
-export default router
+import express from "express";
+import { authenticate } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { profileSchema, avatarSchema } from "../validations/api.validations.js";
+import { getProfile, updateProfile, updateAvatar } from "../controllers/profile.controller.js";
+const router = express.Router();
+router.use(authenticate);
+router.get("/", getProfile);
+router.patch("/", validate(profileSchema), updateProfile);
+router.patch("/avatar", validate(avatarSchema), updateAvatar);
+export default router;

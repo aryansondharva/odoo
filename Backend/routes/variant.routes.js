@@ -1,0 +1,11 @@
+import express from "express";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { variantSchema, variantCreateSchema } from "../validations/rental.validations.js";
+import { listVariants, createVariant, updateVariant, deleteVariant } from "../controllers/variant.controller.js";
+const router = express.Router();
+router.get("/", authenticate, authorize("ADMIN"), listVariants);
+router.post("/", authenticate, authorize("ADMIN"), validate(variantCreateSchema), createVariant);
+router.patch("/:id", authenticate, authorize("ADMIN"), validate(variantSchema.partial()), updateVariant);
+router.delete("/:id", authenticate, authorize("ADMIN"), deleteVariant);
+export default router;

@@ -1,0 +1,12 @@
+import express from "express";
+import { z } from "zod";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { listNotifications, createNotification, readNotification, deleteNotification } from "../controllers/notification.controller.js";
+const router = express.Router();
+router.use(authenticate);
+router.get("/", listNotifications);
+router.post("/", authorize("ADMIN"), validate(z.object({ body: z.object({ userId: z.string().uuid(), title: z.string().min(2).max(150), message: z.string().min(1).max(2000), type: z.string().min(2).max(50) }) })), createNotification);
+router.patch("/:id/read", readNotification);
+router.delete("/:id", deleteNotification);
+export default router;

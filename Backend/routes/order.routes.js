@@ -1,0 +1,17 @@
+import express from "express";
+import { z } from "zod";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { listOrders, getOrder, createOrder, updateOrder, deleteOrder, confirmOrder, cancelOrder, completeOrder } from "../controllers/order.controller.js";
+const orderBody = z.object({ addressId: z.string().uuid(), rentalPeriodId: z.string().uuid(), pickupType: z.enum(["STORE_PICKUP", "HOME_DELIVERY"]), startDate: z.coerce.date(), endDate: z.coerce.date() });
+const router = express.Router();
+router.use(authenticate);
+router.get("/", listOrders);
+router.get("/:id", getOrder);
+router.post("/", validate(z.object({ body: orderBody })), createOrder);
+router.patch("/:id", validate(z.object({ body: orderBody.partial() })), updateOrder);
+router.delete("/:id", deleteOrder);
+router.post("/:id/confirm", authorize("ADMIN"), confirmOrder);
+router.post("/:id/cancel", cancelOrder);
+router.post("/:id/complete", authorize("ADMIN"), completeOrder);
+export default router;

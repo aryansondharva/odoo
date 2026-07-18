@@ -1,11 +1,12 @@
-import express from 'express'
-import { getStats, getPublicStats } from '../controllers/dashboard.controller.js'
-import { authenticate } from '../middleware/auth.middleware.js'
-
-const router = express.Router()
-
-router.get('/stats', authenticate, getStats)
-router.get('/public-stats', getPublicStats)
-
-export default router
-
+import express from "express";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { getDashboard, getRevenue, getRentals, getDeposits, getLateFees, getStatistics } from "../controllers/dashboard.controller.js";
+const router = express.Router();
+router.use(authenticate, authorize("ADMIN"));
+router.get("/", getDashboard);
+router.get("/revenue", getRevenue);
+router.get("/rentals", getRentals);
+router.get("/deposits", getDeposits);
+router.get("/late-fees", getLateFees);
+router.get("/statistics", getStatistics);
+export default router;

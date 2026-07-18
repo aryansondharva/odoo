@@ -1,0 +1,14 @@
+import express from "express";
+import { z } from "zod";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { listReturns, startReturn, confirmReturn, reportDamage, updateReturn } from "../controllers/return.controller.js";
+const condition = z.enum(["GOOD", "DAMAGED", "MISSING_PARTS", "REPAIR_REQUIRED"]);
+const router = express.Router();
+router.use(authenticate);
+router.get("/", listReturns);
+router.post("/start", validate(z.object({ body: z.object({ orderId: z.string().uuid(), returnDate: z.coerce.date() }) })), startReturn);
+router.post("/confirm", authorize("ADMIN"), validate(z.object({ body: z.object({ returnId: z.string().uuid(), condition }) })), confirmReturn);
+router.post("/damage", authorize("ADMIN"), validate(z.object({ body: z.object({ returnId: z.string().uuid(), condition, damageReport: z.string().max(2000).optional(), missingAccessories: z.string().max(1000).optional() }) })), reportDamage);
+router.patch("/:id", authorize("ADMIN"), validate(z.object({ body: z.object({ returnDate: z.coerce.date().optional(), actualReturnDate: z.coerce.date().optional(), condition: condition.optional(), damageReport: z.string().max(2000).optional(), missingAccessories: z.string().max(1000).optional() }) })), updateReturn);
+export default router;

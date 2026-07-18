@@ -1,5 +1,6 @@
 import express from 'express'
 import { login, logout, refresh, getMe, registerUser } from '../controllers/auth.controller.js'
+import { requestPasswordReset, resetPassword } from "../controllers/passwordReset.controller.js"
 import { authenticate } from '../middleware/auth.middleware.js'
 import { validate } from '../middleware/validate.middleware.js'
 import { loginSchema, refreshTokenSchema, registerSchema } from '../validations/auth.validations.js'
@@ -11,6 +12,7 @@ router.post('/register', validate(registerSchema), registerUser)
 router.post('/logout', authenticate, logout)
 router.post('/refresh', validate(refreshTokenSchema), refresh)
 router.get('/me', authenticate, getMe)
+router.post('/forgot-password', requestPasswordReset)
+router.post('/reset-password', resetPassword)
 
 export default router
-

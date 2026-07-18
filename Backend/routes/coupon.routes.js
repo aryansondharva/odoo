@@ -1,0 +1,14 @@
+import express from "express";
+import { z } from "zod";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { listCoupons, createCoupon, updateCoupon, deleteCoupon, validateCoupon } from "../controllers/coupon.controller.js";
+const coupon = z.object({ code: z.string().min(3).max(40).transform((value) => value.toUpperCase()), discountType: z.enum(["PERCENTAGE", "FIXED"]), discountValue: z.coerce.number().positive(), minimumAmount: z.coerce.number().nonnegative().optional(), startDate: z.coerce.date(), endDate: z.coerce.date(), isActive: z.boolean().optional() });
+const router = express.Router();
+router.use(authenticate);
+router.get("/", authorize("ADMIN"), listCoupons);
+router.post("/", authorize("ADMIN"), validate(z.object({ body: coupon })), createCoupon);
+router.patch("/:id", authorize("ADMIN"), validate(z.object({ body: coupon.partial() })), updateCoupon);
+router.delete("/:id", authorize("ADMIN"), deleteCoupon);
+router.post("/validate", validate(z.object({ body: z.object({ code: z.string().min(3), amount: z.coerce.number().nonnegative() }) })), validateCoupon);
+export default router;

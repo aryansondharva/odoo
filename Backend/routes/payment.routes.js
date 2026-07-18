@@ -1,0 +1,14 @@
+import express from "express";
+import { z } from "zod";
+import { authenticate } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { listPayments, getPayment, createPayment, verifyPayment, refundPayment } from "../controllers/payment.controller.js";
+const money = z.coerce.number().positive();
+const router = express.Router();
+router.use(authenticate);
+router.post("/create", validate(z.object({ body: z.object({ orderId: z.string().uuid(), method: z.string().min(2).max(50), amount: money.optional() }) })), createPayment);
+router.post("/verify", validate(z.object({ body: z.object({ paymentId: z.string().uuid(), transactionId: z.string().min(3).max(150) }) })), verifyPayment);
+router.post("/refund", validate(z.object({ body: z.object({ paymentId: z.string().uuid(), amount: money }) })), refundPayment);
+router.get("/", listPayments);
+router.get("/:id", getPayment);
+export default router;

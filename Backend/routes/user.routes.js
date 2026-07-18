@@ -1,0 +1,12 @@
+import express from "express";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { userUpdateSchema } from "../validations/api.validations.js";
+import { listUsers, getUser, updateUser, deleteUser } from "../controllers/user.controller.js";
+const router = express.Router();
+router.use(authenticate);
+router.get("/", authorize("ADMIN"), listUsers);
+router.get("/:id", getUser);
+router.patch("/:id", validate(userUpdateSchema), updateUser);
+router.delete("/:id", authorize("ADMIN"), deleteUser);
+export default router;

@@ -1,0 +1,14 @@
+import express from "express";
+import { z } from "zod";
+import { authenticate } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { getMyCart, addCartItem, updateCartItem, deleteCartItem, clearCart } from "../controllers/cart.controller.js";
+const itemBody = z.object({ productId: z.string().uuid(), variantId: z.string().uuid().optional(), rentalPeriodId: z.string().uuid(), quantity: z.coerce.number().int().positive() });
+const router = express.Router();
+router.use(authenticate);
+router.get("/", getMyCart);
+router.post("/items", validate(z.object({ body: itemBody })), addCartItem);
+router.patch("/items/:id", validate(z.object({ body: itemBody.pick({ variantId: true, rentalPeriodId: true, quantity: true }).partial() })), updateCartItem);
+router.delete("/items/:id", deleteCartItem);
+router.delete("/", clearCart);
+export default router;

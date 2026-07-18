@@ -1,0 +1,15 @@
+import express from "express";
+import { z } from "zod";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { listPickups, todayPickups, schedulePickup, confirmPickup, scanPickup, updatePickup } from "../controllers/pickup.controller.js";
+const scheduled = z.object({ orderId: z.string().uuid(), pickupDate: z.coerce.date(), employeeName: z.string().max(120).optional(), notes: z.string().max(1000).optional() });
+const router = express.Router();
+router.use(authenticate);
+router.get("/", authorize("ADMIN"), listPickups);
+router.get("/today", authorize("ADMIN"), todayPickups);
+router.post("/schedule", authorize("ADMIN"), validate(z.object({ body: scheduled })), schedulePickup);
+router.post("/confirm", authorize("ADMIN"), validate(z.object({ body: z.object({ pickupId: z.string().uuid() }) })), confirmPickup);
+router.post("/scan", authorize("ADMIN"), validate(z.object({ body: z.object({ pickupId: z.string().uuid() }) })), scanPickup);
+router.patch("/:id", authorize("ADMIN"), validate(z.object({ body: scheduled.omit({ orderId: true }).partial() })), updatePickup);
+export default router;

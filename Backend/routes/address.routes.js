@@ -1,0 +1,12 @@
+import express from "express";
+import { authenticate } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { addressSchema } from "../validations/api.validations.js";
+import { listAddresses, createAddress, updateAddress, deleteAddress } from "../controllers/address.controller.js";
+const router = express.Router();
+router.use(authenticate);
+router.get("/", listAddresses);
+router.post("/", validate(addressSchema), createAddress);
+router.patch("/:id", validate(addressSchema.partial()), updateAddress);
+router.delete("/:id", deleteAddress);
+export default router;

@@ -1,0 +1,14 @@
+import express from "express";
+import { z } from "zod";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { listDeposits, depositHistory, collectDeposit, refundDeposit, deductDeposit } from "../controllers/deposit.controller.js";
+const amountBody = z.object({ orderId: z.string().uuid(), amount: z.coerce.number().positive() });
+const router = express.Router();
+router.use(authenticate);
+router.get("/", listDeposits);
+router.get("/history", depositHistory);
+router.post("/collect", authorize("ADMIN"), validate(z.object({ body: amountBody })), collectDeposit);
+router.post("/refund", authorize("ADMIN"), validate(z.object({ body: amountBody })), refundDeposit);
+router.post("/deduct", authorize("ADMIN"), validate(z.object({ body: amountBody })), deductDeposit);
+export default router;

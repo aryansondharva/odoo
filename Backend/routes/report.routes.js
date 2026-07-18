@@ -1,0 +1,11 @@
+import express from "express";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { revenueReport, productReport, customerReport, orderReport, exportReport } from "../controllers/report.controller.js";
+const router = express.Router();
+router.use(authenticate, authorize("ADMIN"));
+router.get("/revenue", revenueReport);
+router.get("/products", productReport);
+router.get("/customers", customerReport);
+router.get("/orders", orderReport);
+router.get("/export", exportReport);
+export default router;

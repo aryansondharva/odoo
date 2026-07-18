@@ -1,0 +1,11 @@
+import express from "express";
+import { z } from "zod";
+import { authenticate, authorize } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+import { getSettings, updateSettings } from "../controllers/settings.controller.js";
+const body = z.object({ defaultDepositType: z.enum(["PERCENTAGE", "FIXED"]).optional(), defaultDepositValue: z.coerce.number().nonnegative().optional(), lateFeeType: z.enum(["PERCENTAGE", "FIXED"]).optional(), lateFeeValue: z.coerce.number().nonnegative().optional(), gracePeriod: z.coerce.number().int().nonnegative().optional(), maxLateFee: z.coerce.number().nonnegative().nullable().optional(), currency: z.string().length(3).optional(), taxPercentage: z.coerce.number().min(0).max(100).optional() });
+const router = express.Router();
+router.use(authenticate);
+router.get("/", authorize("ADMIN"), getSettings);
+router.patch("/", authorize("ADMIN"), validate(z.object({ body })), updateSettings);
+export default router;
