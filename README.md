@@ -1,10 +1,10 @@
-# 🚀 RentFlow - Rental Management System
+#  RentFlow - Rental Management System
 
 A comprehensive full-stack rental management platform built with **React**, **Node.js**, **Express**, and **PostgreSQL**. RentFlow enables vendors to manage rental products, customers to browse and rent items, and admins to oversee the entire platform.
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
@@ -20,9 +20,9 @@ A comprehensive full-stack rental management platform built with **React**, **No
 
 ---
 
-## ✨ Features
+##  Features
 
-### 🛒 **Customer Features**
+###  **Customer Features**
 - Browse 100+ rental products across multiple categories
 - Advanced search and filtering by category, brand, price
 - Add products to cart with rental date selection
@@ -31,7 +31,7 @@ A comprehensive full-stack rental management platform built with **React**, **No
 - Order tracking and history
 - User profile management
 
-### 🏪 **Vendor Features**
+###  **Vendor Features**
 - Vendor dashboard with analytics
 - Product management (add, edit, delete products)
 - Order management with status tracking
@@ -39,7 +39,7 @@ A comprehensive full-stack rental management platform built with **React**, **No
 - Revenue reports and top product analytics
 - Customer management
 
-### 👨‍💼 **Admin Features**
+###  **Admin Features**
 - Platform-wide analytics dashboard
 - User management (customers, vendors, admins)
 - Product oversight across all vendors
@@ -47,7 +47,7 @@ A comprehensive full-stack rental management platform built with **React**, **No
 - Revenue reports by category and vendor
 - Coupon management system
 
-### 🎟️ **Dynamic Coupon System**
+###  **Dynamic Coupon System**
 - Database-driven coupon validation
 - Percentage-based discounts
 - Expiry date and usage limit tracking
@@ -56,7 +56,7 @@ A comprehensive full-stack rental management platform built with **React**, **No
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### **Frontend**
 - **React** 18.x - UI library
@@ -143,7 +143,7 @@ rentralsystem-odoo/
 
 ---
 
-## 🚀 Installation
+##  Installation
 
 ### **Prerequisites**
 - Node.js (v16 or higher)
@@ -213,7 +213,7 @@ This will create:
 
 ---
 
-## ▶️ Running the Application
+##  Running the Application
 
 ### **Start Backend Server**
 ```bash
@@ -315,7 +315,7 @@ GET    /api/reports/vendor         # Get vendor analytics
 5. Usage count is incremented
 
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -328,4 +328,4 @@ Contributions are welcome! Please follow these steps:
 ---
 
 
-**Made with ❤️ for the Odoo Hackathon**
+**Made with ❤️ for the Odoo x KSV Hackathon**
