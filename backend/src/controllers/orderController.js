@@ -39,7 +39,7 @@ const createOrder = async (req, res) => {
             userId = req.body.customerId;
         }
         // Extract all new fields
-        const { items, total, untaxedAmount, taxAmount, discountAmount, shippingCost, note } = req.body;
+        const { items, total, untaxedAmount, taxAmount, discountAmount, shippingCost, deliveryAddress, billingAddress, note } = req.body;
 
         if (!items || items.length === 0) {
             return res.status(400).json({ success: false, message: 'No items in order' });
@@ -60,6 +60,8 @@ const createOrder = async (req, res) => {
                     taxAmount: taxAmount || 0,
                     discountAmount: discountAmount || 0,
                     shippingCost: shippingCost || 0,
+                    deliveryAddress: deliveryAddress?.trim() || null,
+                    billingAddress: billingAddress?.trim() || deliveryAddress?.trim() || null,
                     note: note || null,
                     status: 'QUOTATION',
                     items: {
