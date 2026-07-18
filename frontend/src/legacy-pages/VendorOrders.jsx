@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import Modal from '../components/Modal';
 import './VendorOrders.css';
 
 const VendorOrders = () => {
@@ -22,6 +23,9 @@ const VendorOrders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [returnOrder, setReturnOrder] = useState(null);
+    const [isReturning, setIsReturning] = useState(false);
+    const [returnError, setReturnError] = useState('');
     const fileInputRef = React.useRef(null);
 
     React.useEffect(() => {
@@ -139,20 +143,43 @@ const VendorOrders = () => {
     };
 
     const handleReturn = async (orderId) => {
-        if (!window.confirm("Confirm return for this order? Stock will be restored.")) return;
         try {
             const res = await api.post(`/orders/${orderId}/return`);
             if (res.data.success) {
                 const lateFee = res.data.lateFee;
-                let msg = "Order Returned! Stock restored.";
-                if (lateFee > 0) msg += `\nLate Fee Applied: R${Number(lateFee).toFixed(2)}`;
-
-                alert(msg);
                 setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'RETURNED', lateFee: lateFee } : o));
+                return { success: true, lateFee };
             }
+            return { success: false, message: res.data?.message || 'Unable to complete this return.' };
         } catch (error) {
             console.error("Return Error", error);
-            alert(error.response?.data?.message || "Failed to return order.");
+            return { success: false, message: error.response?.data?.message || 'Failed to return the order.' };
+        }
+    };
+
+    const openReturnModal = (order) => {
+        setReturnError('');
+        setReturnOrder(order);
+    };
+
+    const closeReturnModal = () => {
+        if (isReturning) return;
+        setReturnError('');
+        setReturnOrder(null);
+    };
+
+    const confirmReturn = async () => {
+        if (!returnOrder) return;
+        setIsReturning(true);
+        setReturnError('');
+        const result = await handleReturn(returnOrder.id);
+        setIsReturning(false);
+
+        if (result.success) {
+            setReturnError('');
+            setReturnOrder(null);
+        } else {
+            setReturnError(result.message);
         }
     };
 
@@ -469,7 +496,7 @@ const VendorOrders = () => {
                                         {/* Return Action */}
                                         {isVendor && order.status === 'PICKED_UP' && (
                                             <div style={{ display: "flex", gap: "0.5rem" }}>
-                                                <button className="btn-confirm" onClick={() => handleReturn(order.id)} style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--success)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                                <button className="btn-confirm" onClick={() => openReturnModal(order)} style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--success)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                                                     Return
                                                 </button>
                                             </div>
@@ -561,6 +588,45 @@ const VendorOrders = () => {
                     </div>
                 </div>
             </div>
+
+            <Modal
+                open={Boolean(returnOrder)}
+                onClose={closeReturnModal}
+                title="Confirm rental return"
+                description="Review the return before inventory is restored. This action updates the order status immediately."
+                size="sm"
+                footer={(
+                    <>
+                        <button
+                            type="button"
+                            data-modal-autofocus
+                            onClick={closeReturnModal}
+                            disabled={isReturning}
+                            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-medium text-slate-300 transition-colors hover:bg-white/[0.08] hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={confirmReturn}
+                            disabled={isReturning}
+                            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-cyan-400 px-4 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-wait disabled:opacity-60"
+                        >
+                            {isReturning ? 'Processing return…' : 'Confirm return'}
+                        </button>
+                    </>
+                )}
+            >
+                <div className="space-y-4">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                        <p className="text-xs font-medium uppercase tracking-[0.16em] text-slate-500">Order</p>
+                        <p className="mt-1 text-base font-semibold text-white">{returnOrder?.orderNumber || 'Rental order'}</p>
+                        <p className="mt-1 text-sm text-slate-400">{returnOrder?.user?.name || 'Customer'} · {returnOrder?.items?.[0]?.product?.name || 'Rental item'}</p>
+                    </div>
+                    <p className="text-sm leading-6 text-slate-300">The item will be marked as returned and its stock will become available again.</p>
+                    {returnError && <p role="alert" className="rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-200">{returnError}</p>}
+                </div>
+            </Modal>
         </div>
     );
 };
