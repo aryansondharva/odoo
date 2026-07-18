@@ -15,6 +15,7 @@ export const createRentalPeriod = async (req, res, next) => {
 };
 
 export const updateRentalPeriod = async (req, res, next) => {
-  try { const period = await prisma.rentalPeriod.update({ where: { id: req.params.rentalPeriodId }, data: req.body }); res.json({ status: "success", data: period }); }
+  try { const period = await prisma.rentalPeriod.update({ where: { id: req.params.id }, data: req.body }); res.json({ status: "success", data: period }); }
   catch (error) { next(error); }
 };
+export const deleteRentalPeriod = async (req, res, next) => { try { await prisma.rentalPeriod.delete({ where: { id: req.params.id } }); res.status(204).send(); } catch (error) { next(error); } };

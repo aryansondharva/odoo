@@ -4,10 +4,10 @@ export const errorHandler = (err, req, res, next) => {
 
   // Prisma errors
   if (err.code === 'P2002') {
-    return res.status(400).json({
+    return res.status(409).json({
       status: 'error',
       message: 'Duplicate entry. This record already exists.',
-      error: 'Validation Error',
+      error: 'Conflict',
     })
   }
 
@@ -49,4 +49,3 @@ export const errorHandler = (err, req, res, next) => {
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   })
 }
-

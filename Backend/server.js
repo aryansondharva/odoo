@@ -10,12 +10,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 import authRoutes from "./routes/auth.routes.js";
-import dashboardRoutes from "./routes/dashboard.routes.js";
-import profileRoutes from "./routes/profile.routes.js";
-import passwordResetRoutes from "./routes/passwordReset.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import rentalPeriodRoutes from "./routes/rentalPeriod.routes.js";
+import variantRoutes from "./routes/variant.routes.js";
+import addressRoutes from "./routes/address.routes.js";
+import profileRoutes from "./routes/profile.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import cartRoutes from "./routes/cart.routes.js";
+import quotationRoutes from "./routes/quotation.routes.js";
+import orderRoutes from "./routes/order.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
+import depositRoutes from "./routes/deposit.routes.js";
+import pickupRoutes from "./routes/pickup.routes.js";
+import returnRoutes from "./routes/return.routes.js";
+import invoiceRoutes from "./routes/invoice.routes.js";
+import notificationRoutes from "./routes/notification.routes.js";
+import settingsRoutes from "./routes/settings.routes.js";
+import dashboardRoutes from "./routes/dashboard.routes.js";
+import reportRoutes from "./routes/report.routes.js";
+import couponRoutes from "./routes/coupon.routes.js";
 
 import { errorHandler } from "./middleware/error.middleware.js";
 
@@ -44,13 +58,27 @@ app.get("/health", (req, res) => {
 });
 
 // API Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/profile", profileRoutes);
-app.use("/api/password-reset", passwordResetRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/rental-periods", rentalPeriodRoutes);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/rental-periods", rentalPeriodRoutes);
+app.use("/api/v1/variants", variantRoutes);
+app.use("/api/v1/addresses", addressRoutes);
+app.use("/api/v1/profile", profileRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/cart", cartRoutes);
+app.use("/api/v1/quotations", quotationRoutes);
+app.use("/api/v1/orders", orderRoutes);
+app.use("/api/v1/payments", paymentRoutes);
+app.use("/api/v1/deposits", depositRoutes);
+app.use("/api/v1/pickups", pickupRoutes);
+app.use("/api/v1/returns", returnRoutes);
+app.use("/api/v1/invoices", invoiceRoutes);
+app.use("/api/v1/notifications", notificationRoutes);
+app.use("/api/v1/settings", settingsRoutes);
+app.use("/api/v1/dashboard", dashboardRoutes);
+app.use("/api/v1/reports", reportRoutes);
+app.use("/api/v1/coupons", couponRoutes);
 
 // Error handling
 app.use(errorHandler);
@@ -64,6 +92,6 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 API available at http://localhost:${PORT}/api`);
+  console.log(`Rental API running on port ${PORT}`);
+  console.log(`API available at http://localhost:${PORT}/api/v1`);
 });

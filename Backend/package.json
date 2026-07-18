@@ -1,7 +1,7 @@
 {
-  "name": "workzen-hrms-backend",
+  "name": "rental-management-api",
   "version": "1.0.0",
-  "description": "WorkZen HRMS Backend API",
+  "description": "Rental Management System REST API",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -19,12 +19,12 @@
     "seed": "node prisma/seed.js"
   },
   "keywords": [
-    "hrms",
+    "rental-management",
     "api",
     "express",
     "prisma"
   ],
-  "author": "WorkZen HRMS Team",
+  "author": "Rental Management System Team",
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.7.1",
