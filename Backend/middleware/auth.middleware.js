@@ -27,11 +27,11 @@ export const authenticate = async (req, res, next) => {
         select: {
           id: true,
           email: true,
-          firstName: true,
-          lastName: true,
+          name: true,
           role: true,
           avatar: true,
           phone: true,
+          isVerified: true,
           createdAt: true,
           updatedAt: true,
         },

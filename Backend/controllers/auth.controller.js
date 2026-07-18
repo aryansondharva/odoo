@@ -151,20 +151,6 @@ export const registerUser = async (req, res, next) => {
       });
     }
 
-    // Split name
-    const nameParts = name.trim().split(" ");
-    const firstName = nameParts[0] || "";
-    const lastName = nameParts.slice(1).join(" ") || firstName;
-
-    if (firstName.length < 2 || lastName.length < 2) {
-      return res.status(400).json({
-        status: "error",
-        message:
-          "First name and last name must each be at least 2 characters long",
-        error: "Validation Error",
-      });
-    }
-
     const userCount = await prisma.user.count();
     // Only the first account is promoted to admin. All subsequent registrations
     // are customers; admin access cannot be self-assigned from the public API.
@@ -176,19 +162,16 @@ export const registerUser = async (req, res, next) => {
       data: {
         email,
         password: hashedPassword,
-        firstName,
-        lastName,
+        name: name.trim(),
         role,
         phone: phone || null,
       },
       select: {
         id: true,
         email: true,
-        firstName: true,
-        lastName: true,
+        name: true,
         role: true,
-        avatar: true,
-        phone: true,
+        isVerified: true,
         createdAt: true,
         updatedAt: true,
       },

@@ -4,8 +4,7 @@ const prisma = new PrismaClient();
 
 export const listRentalPeriods = async (req, res, next) => {
   try {
-    const where = req.query.includeInactive === "true" ? {} : { isActive: true };
-    const periods = await prisma.rentalPeriod.findMany({ where, orderBy: [{ sortOrder: "asc" }, { duration: "asc" }] });
+    const periods = await prisma.rentalPeriod.findMany({ orderBy: { duration: "asc" } });
     res.json({ status: "success", data: periods });
   } catch (error) { next(error); }
 };
