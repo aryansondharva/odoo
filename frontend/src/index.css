@@ -324,13 +324,6 @@ select.input-select {
   color: var(--text-dark) !important;
 }
 
-#root input[type='checkbox'],
-#root input[type='radio'] {
-  width: auto;
-  padding: 0;
-  background: transparent !important;
-}
-
 #root .btn,
 #root .button,
 #root button.btn-primary,
@@ -354,8 +347,27 @@ select.input-select {
 }
 
 /* Covers customer, vendor, admin, checkout, account, and information route shells. */
-#root [class$='-page'],
-#root [class*='-page '] {
+#root .dashboard-page,
+#root .admin-dashboard-page,
+#root .vendor-dashboard-page,
+#root .vendor-orders-page,
+#root .vendor-products-page,
+#root .vendor-profile-page,
+#root .vendor-reports-page,
+#root .vendor-settings-page,
+#root .vendor-product-page,
+#root .vendor-new-order-page,
+#root .vendor-invoice-page,
+#root .customer-dashboard,
+#root .customer-orders,
+#root .customer-order-detail,
+#root .cart-page,
+#root .address-page,
+#root .payment-page,
+#root .order-success-page,
+#root .product-detail-page,
+#root .login-page,
+#root .signup-body {
   background: var(--bg-light) !important;
   color: var(--text-dark) !important;
   font-family: Inter, Arial, sans-serif !important;

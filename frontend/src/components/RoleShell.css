@@ -12,5 +12,6 @@
 .role-shell-account-name { font-size: .78rem; font-weight: 800; }
 .role-shell-signout { color: var(--rf-muted); font-size: .7rem; }
 /* Legacy pages keep their content but use the shared role navigation. */
-.role-shell-content :is(.top-nav, .header) { display: none !important; }
+.role-shell-content .top-nav,
+.role-shell-content .header { display: none !important; }
 @media (max-width: 850px) { .role-shell-nav { padding: 0 1rem; gap: 1rem; } .role-shell-links { justify-content: flex-start; gap: 1rem; overflow-x: auto; } .role-shell-account-name, .role-shell-signout { display: none; } }

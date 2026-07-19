@@ -799,3 +799,142 @@
         border-radius: 8px;
     }
 }
+
+/* Admin dashboard light treatment for registration. */
+.signup-body {
+    --primary: #f4f2ee;
+    --accent: #111111;
+    --accent-warm: #77736e;
+    --surface: #ffffff;
+    --surface-light: #f8f7f4;
+    --text: #111111;
+    --text-muted: #6d6963;
+    --border: #dedbd4;
+    background: #f4f2ee;
+    color: var(--text);
+}
+
+.signup-body .register-container {
+    box-shadow: none;
+}
+
+.signup-body .register-card {
+    border-color: var(--border);
+    background: var(--surface);
+    box-shadow: none;
+}
+
+.signup-body .register-card::before {
+    background: #111111;
+}
+
+.signup-body .signup-showcase {
+    border-color: var(--border);
+    background: #e9e7e2;
+    color: var(--text);
+}
+
+.signup-body .logo,
+.signup-body h1,
+.signup-body .role-title,
+.signup-body label,
+.signup-body .signup-showcase h2,
+.signup-body .signup-showcase p {
+    color: var(--text);
+}
+
+.signup-body .subtitle,
+.signup-body .role-desc,
+.signup-body .password-requirements,
+.signup-body .login-link,
+.signup-body .back-home a,
+.signup-body .showcase-note-card span {
+    color: var(--text-muted);
+}
+
+.signup-body .role-card,
+.signup-body input,
+.signup-body select {
+    border-color: var(--border);
+    background: #ffffff;
+    color: var(--text);
+}
+
+.signup-body .role-card:hover,
+.signup-body .role-card.active {
+    border-color: #111111;
+    background: #f2f0eb;
+}
+
+.signup-body input:focus,
+.signup-body select:focus {
+    border-color: #111111;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.1);
+}
+
+.signup-body .btn {
+    background: #111111;
+    color: #ffffff;
+}
+
+.signup-body .btn:hover {
+    background: #333333;
+}
+
+.signup-body .showcase-kicker {
+    border-color: #aaa7a0;
+    border-radius: 4px;
+    color: #111111;
+}
+
+.signup-body .showcase-stat-card,
+.signup-body .showcase-note-card {
+    border-color: var(--border);
+    background: #ffffff;
+    color: var(--text);
+}
+
+.signup-body .stat-card-label,
+.signup-body .note-icon {
+    color: #111111;
+}
+
+.signup-body .note-icon {
+    background: #f2f0eb;
+}
+
+.signup-body .stat-bars span,
+.signup-body .stat-bars span:nth-child(1),
+.signup-body .stat-bars span:nth-child(2),
+.signup-body .stat-bars span:nth-child(3),
+.signup-body .stat-bars span:nth-child(4) {
+    background: #bcb8b0;
+}
+
+.signup-body .stat-bars span:nth-child(2),
+.signup-body .stat-bars span:nth-child(4) {
+    background: #111111;
+}
+
+.signup-body .role-icon,
+.signup-body .role-icon-customer span,
+.signup-body .role-icon-vendor span,
+.signup-body .role-icon-vendor::after {
+    border-color: #111111;
+}
+
+.signup-body .role-icon-customer::after,
+.signup-body .role-icon-vendor::before {
+    background: #111111;
+}
+
+.signup-body .role-icon-customer::after {
+    box-shadow: 12px 0 #111111;
+}
+
+.signup-body .server-error {
+    border-color: #dba8a3;
+    background: #fff1ef;
+    color: #9f302c;
+}
