@@ -26,6 +26,9 @@ const VendorOrders = () => {
     const [returnOrder, setReturnOrder] = useState(null);
     const [isReturning, setIsReturning] = useState(false);
     const [returnError, setReturnError] = useState('');
+    const [actionDialog, setActionDialog] = useState(null);
+    const [isActionPending, setIsActionPending] = useState(false);
+    const [actionError, setActionError] = useState('');
     const fileInputRef = React.useRef(null);
 
     React.useEffect(() => {
@@ -49,6 +52,43 @@ const VendorOrders = () => {
         setIsSettingsOpen(!isSettingsOpen);
     };
 
+    const showNotice = (title, description) => {
+        setActionError('');
+        setActionDialog({ kind: 'notice', title, description });
+    };
+
+    const requestConfirmation = ({ title, description, confirmLabel, onConfirm, tone = 'primary' }) => {
+        setActionError('');
+        setActionDialog({ kind: 'confirm', title, description, confirmLabel, onConfirm, tone });
+    };
+
+    const closeActionDialog = () => {
+        if (isActionPending) return;
+        setActionError('');
+        setActionDialog(null);
+    };
+
+    const confirmActionDialog = async () => {
+        if (!actionDialog?.onConfirm || isActionPending) return;
+
+        setIsActionPending(true);
+        setActionError('');
+
+        try {
+            const outcome = await actionDialog.onConfirm();
+            setActionDialog({
+                kind: 'notice',
+                title: outcome?.title || 'Action completed',
+                description: outcome?.description || 'Your changes have been saved.',
+            });
+        } catch (error) {
+            console.error('Order action failed', error);
+            setActionError(error.response?.data?.message || error.message || 'Unable to complete this action. Please try again.');
+        } finally {
+            setIsActionPending(false);
+        }
+    };
+
     const handleExport = async () => {
         setIsSettingsOpen(false);
         try {
@@ -62,7 +102,7 @@ const VendorOrders = () => {
             link.remove();
         } catch (error) {
             console.error('Export failed', error);
-            alert("Failed to export. ensure you have orders.");
+            showNotice('Export unavailable', 'We could not export orders. Make sure there is at least one order and try again.');
         }
     };
 
@@ -80,9 +120,11 @@ const VendorOrders = () => {
 
         try {
             // await api.post('/orders/import', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-            alert(`Selected file: ${file.name}. Import logic to be connected.`);
+            showNotice('File selected', `${file.name} is ready. Order import will be available once the import endpoint is connected.`);
         } catch (error) {
-            alert("Import failed.");
+            showNotice('Import unavailable', 'The selected file could not be prepared for import. Please try again.');
+        } finally {
+            e.target.value = '';
         }
     };
 
@@ -95,51 +137,51 @@ const VendorOrders = () => {
         }));
     };
 
-    const handleConfirmOrder = async (orderId) => {
-        if (!window.confirm("Confirm this order? This will reserve the stock.")) return;
-        try {
-            const res = await api.post(`/orders/${orderId}/confirm`);
-            if (res.data.success) {
-                alert("Order confirmed!");
+    const handleConfirmOrder = (orderId) => {
+        requestConfirmation({
+            title: 'Confirm rental order',
+            description: 'This will reserve the required stock and move the quotation to a sales order.',
+            confirmLabel: 'Confirm order',
+            onConfirm: async () => {
+                const res = await api.post(`/orders/${orderId}/confirm`);
+                if (!res.data.success) throw new Error(res.data?.message || 'Failed to confirm order.');
                 setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'SALES_ORDER' } : o));
-            }
-        } catch (error) {
-            console.error("Confirmation Error", error);
-            alert(error.response?.data?.message || "Failed to confirm order.");
-        }
+                return { title: 'Order confirmed', description: 'Stock has been reserved and the rental is ready for invoicing.' };
+            },
+        });
     };
 
-    const handlePayOrder = async (orderId) => {
-        if (!window.confirm("Proceed to payment for this order?")) return;
-        try {
-            const res = await api.post(`/orders/${orderId}/pay`);
-            if (res.data.success) {
-                alert("Payment Successful! Invoice generated.");
+    const handlePayOrder = (orderId) => {
+        requestConfirmation({
+            title: 'Proceed with payment',
+            description: 'This records payment for the rental and makes the order ready for pickup.',
+            confirmLabel: 'Record payment',
+            onConfirm: async () => {
+                const res = await api.post(`/orders/${orderId}/pay`);
+                if (!res.data.success) throw new Error(res.data?.message || 'Payment failed.');
                 setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'PAID' } : o));
-            }
-        } catch (error) {
-            console.error("Payment Error", error);
-            alert(error.response?.data?.message || "Payment failed.");
-        }
+                return { title: 'Payment recorded', description: 'The invoice has been generated and the order is ready for pickup.' };
+            },
+        });
     };
 
     const handlePrintInvoice = (orderId) => {
-        alert(`Printing Invoice for Order #${orderId}... (Mock Feature)`);
+        showNotice('Invoice preview', `Invoice for order #${orderId} is ready to print. Printing is currently a preview-only feature.`);
         // window.open(`/api/invoices/${orderId}`, '_blank');
     };
 
-    const handlePickup = async (orderId) => {
-        if (!window.confirm("Confirm pickup for this order? Stock will be deducted.")) return;
-        try {
-            const res = await api.post(`/orders/${orderId}/pickup`);
-            if (res.data.success) {
-                alert("Order Picked Up! Stock updated.");
+    const handlePickup = (orderId) => {
+        requestConfirmation({
+            title: 'Confirm equipment pickup',
+            description: 'The rental will be marked as picked up and the item will no longer be available in stock.',
+            confirmLabel: 'Confirm pickup',
+            onConfirm: async () => {
+                const res = await api.post(`/orders/${orderId}/pickup`);
+                if (!res.data.success) throw new Error(res.data?.message || 'Failed to pickup order.');
                 setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'PICKED_UP' } : o));
-            }
-        } catch (error) {
-            console.error("Pickup Error", error);
-            alert(error.response?.data?.message || "Failed to pickup order.");
-        }
+                return { title: 'Pickup confirmed', description: 'Stock has been updated and the rental is now in progress.' };
+            },
+        });
     };
 
     const handleReturn = async (orderId) => {
@@ -183,23 +225,21 @@ const VendorOrders = () => {
         }
     };
 
-    const handleCreateInvoice = async (orderId) => {
-        if (!window.confirm("Generate invoice for this confirmed order?")) return;
-        try {
-            const res = await api.post(`/invoice/create/${orderId}`);
-            if (res.data.success) {
-                alert("Invoice Created Successfully! Customer can now pay.");
-                // Optimistically update to prevent double click (though backend prevents it)
-                // In a real app we'd refetch, but here let's just alert.
-            }
-        } catch (error) {
-            console.error("Invoice Creation Error", error);
-            alert(error.response?.data?.message || "Failed to create invoice.");
-        }
+    const handleCreateInvoice = (orderId) => {
+        requestConfirmation({
+            title: 'Create rental invoice',
+            description: 'An invoice will be created for this confirmed rental so the customer can complete payment.',
+            confirmLabel: 'Create invoice',
+            onConfirm: async () => {
+                const res = await api.post(`/invoice/create/${orderId}`);
+                if (!res.data.success) throw new Error(res.data?.message || 'Failed to create invoice.');
+                return { title: 'Invoice created', description: 'The customer can now complete payment for this rental.' };
+            },
+        });
     };
 
-    const handlePrintPickup = (orderId) => alert(`Printing Pickup Slip for Order #${orderId}...`);
-    const handlePrintReturn = (orderId) => alert(`Printing Return Receipt for Order #${orderId}...`);
+    const handlePrintPickup = (orderId) => showNotice('Pickup slip preview', `Pickup slip for order #${orderId} is ready to print. Printing is currently a preview-only feature.`);
+    const handlePrintReturn = (orderId) => showNotice('Return receipt preview', `Return receipt for order #${orderId} is ready to print. Printing is currently a preview-only feature.`);
 
     const getSelectedOrderIds = () => {
         return Object.entries(checkedItems)
@@ -207,32 +247,55 @@ const VendorOrders = () => {
             .map(([id]) => id);
     };
 
-    const handleBulkAction = async (actionType) => {
+    const handleBulkAction = (actionType) => {
         const selectedIds = getSelectedOrderIds();
         if (selectedIds.length === 0) {
-            alert(`Please select at least one order to ${actionType}.`);
+            showNotice('Select an order first', `Select at least one order before starting a ${actionType.toLowerCase()} action.`);
             return;
         }
 
-        if (!window.confirm(`Are you sure you want to mark ${selectedIds.length} orders as ${actionType}?`)) return;
+        requestConfirmation({
+            title: `Confirm bulk ${actionType.toLowerCase()}`,
+            description: `${selectedIds.length} selected ${selectedIds.length === 1 ? 'order' : 'orders'} will be marked as ${actionType.toLowerCase()}. Review your selection before continuing.`,
+            confirmLabel: `Confirm ${actionType.toLowerCase()}`,
+            onConfirm: async () => {
+                const completedOrders = new Map();
+                let failCount = 0;
 
-        let successCount = 0;
-        let failCount = 0;
+                // Process sequentially so stock-related updates remain predictable.
+                for (const id of selectedIds) {
+                    try {
+                        const endpoint = actionType === 'Pickup' ? `/orders/${id}/pickup` : `/orders/${id}/return`;
+                        const res = await api.post(endpoint);
+                        if (res.data.success) {
+                            completedOrders.set(id, { lateFee: res.data.lateFee });
+                        } else {
+                            failCount++;
+                        }
+                    } catch (error) {
+                        console.error(`${actionType} failed for ${id}`, error);
+                        failCount++;
+                    }
+                }
 
-        // processing sequentially to avoid overwhelming server or race conditions on stock if any
-        for (const id of selectedIds) {
-            try {
-                const endpoint = actionType === 'Pickup' ? `/orders/${id}/pickup` : `/orders/${id}/return`;
-                const res = await api.post(endpoint);
-                if (res.data.success) successCount++;
-            } catch (error) {
-                console.error(`${actionType} failed for ${id}`, error);
-                failCount++;
-            }
-        }
+                const nextStatus = actionType === 'Pickup' ? 'PICKED_UP' : 'RETURNED';
+                setOrders(prev => prev.map(order => {
+                    const completed = completedOrders.get(order.id);
+                    return completed ? { ...order, status: nextStatus, ...(completed.lateFee !== undefined ? { lateFee: completed.lateFee } : {}) } : order;
+                }));
+                setCheckedItems(prev => {
+                    const next = { ...prev };
+                    selectedIds.forEach(id => { delete next[id]; });
+                    return next;
+                });
 
-        alert(`${actionType} Process Completed.\nSuccessful: ${successCount}\nFailed: ${failCount} (Check order status requirements)`);
-        window.location.reload();
+                const successCount = completedOrders.size;
+                return {
+                    title: `Bulk ${actionType.toLowerCase()} complete`,
+                    description: `${successCount} ${successCount === 1 ? 'order was' : 'orders were'} updated${failCount ? `. ${failCount} could not be updated; check their current status and try again.` : '.'}`,
+                };
+            },
+        });
     };
 
     // --- Filtering Logic ---
@@ -588,6 +651,59 @@ const VendorOrders = () => {
                     </div>
                 </div>
             </div>
+
+            <Modal
+                open={Boolean(actionDialog)}
+                onClose={closeActionDialog}
+                title={actionDialog?.title || ''}
+                description={actionDialog?.description}
+                size="sm"
+                footer={actionDialog?.kind === 'confirm' ? (
+                    <>
+                        <button
+                            type="button"
+                            data-modal-autofocus
+                            onClick={closeActionDialog}
+                            disabled={isActionPending}
+                            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] px-4 text-sm font-medium text-slate-300 transition-colors hover:bg-white/[0.08] hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={confirmActionDialog}
+                            disabled={isActionPending}
+                            className={`inline-flex min-h-11 items-center justify-center rounded-xl px-4 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:cursor-wait disabled:opacity-60 ${actionDialog?.tone === 'danger' ? 'bg-rose-400 text-rose-950 hover:bg-rose-300 focus:ring-rose-300' : 'bg-cyan-400 text-slate-950 hover:bg-cyan-300 focus:ring-cyan-300'}`}
+                        >
+                            {isActionPending ? 'Saving changesâ€¦' : actionDialog?.confirmLabel || 'Confirm'}
+                        </button>
+                    </>
+                ) : (
+                    <button
+                        type="button"
+                        data-modal-autofocus
+                        onClick={closeActionDialog}
+                        className="inline-flex min-h-11 items-center justify-center rounded-xl bg-cyan-400 px-5 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-900"
+                    >
+                        Done
+                    </button>
+                )}
+            >
+                <div className="space-y-4">
+                    <div className="rounded-xl border border-cyan-300/15 bg-cyan-300/[0.06] p-4">
+                        <p className="text-sm leading-6 text-slate-200">
+                            {actionDialog?.kind === 'confirm'
+                                ? 'Please confirm this action. The order timeline and available stock may be updated immediately.'
+                                : 'You can safely close this message and continue working with your orders.'}
+                        </p>
+                    </div>
+                    {actionError && (
+                        <p role="alert" className="rounded-xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm leading-6 text-rose-200">
+                            {actionError}
+                        </p>
+                    )}
+                </div>
+            </Modal>
 
             <Modal
                 open={Boolean(returnOrder)}

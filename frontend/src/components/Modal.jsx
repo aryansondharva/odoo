@@ -117,11 +117,14 @@ const Modal = ({
     return createPortal(
         <div
             className={`fixed inset-0 z-[1000] flex items-end justify-center p-4 sm:items-center sm:p-6 transition-opacity duration-200 motion-reduce:transition-none ${isVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
-            onMouseDown={(event) => {
-                if (closeOnBackdrop && event.target === event.currentTarget) requestClose();
-            }}
         >
-            <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-md" aria-hidden="true" />
+            <div
+                className="absolute inset-0 bg-slate-950/75 backdrop-blur-md"
+                aria-hidden="true"
+                onMouseDown={() => {
+                    if (closeOnBackdrop) requestClose();
+                }}
+            />
             <section
                 ref={dialogRef}
                 role="dialog"
