@@ -151,7 +151,8 @@ const VendorDashboard = () => {
             <main className="vendor-main-content">
                 <div className="vendor-header">
                     <div className="vendor-header-left">
-                        <h2 className="page-title">Vendor Dashboard</h2>
+                        <span className="vendor-eyebrow">VENDOR / 01</span>
+                        <h2 className="page-title">Run your inventory<br /><span>with clarity.</span></h2>
                         <p className="vendor-header-subtitle">Manage your rental inventory and orders</p>
                     </div>
                     <div className="vendor-header-right">

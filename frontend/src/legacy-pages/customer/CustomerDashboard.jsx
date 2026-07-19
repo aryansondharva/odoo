@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/client';
 import OrderStatusBadge from '../../components/OrderStatusBadge';
@@ -16,6 +17,12 @@ const CustomerDashboard = () => {
     });
     const [recentOrders, setRecentOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const initials = (user?.name || 'Customer')
+        .split(/\s+/)
+        .map((name) => name[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase();
 
     useEffect(() => {
         if (!user || user.role !== 'CUSTOMER') {
@@ -96,15 +103,38 @@ const CustomerDashboard = () => {
 
     return (
         <div className="customer-dashboard">
-            {/* Header */}
+            <nav className="customer-nav" aria-label="Customer navigation">
+                <div className="customer-nav-inner">
+                    <Link to="/customer/dashboard" className="customer-brand">
+                        RentFlow<span>.</span> <small>CUSTOMER</small>
+                    </Link>
+                    <div className="customer-nav-tabs">
+                        <Link to="/customer/dashboard" className="customer-nav-tab active">Dashboard</Link>
+                        <Link to="/dashboard" className="customer-nav-tab">Browse</Link>
+                        <Link to="/customer/orders" className="customer-nav-tab">Orders</Link>
+                        <Link to="/cart" className="customer-nav-tab">Cart</Link>
+                        <Link to="/customer/settings" className="customer-nav-tab">Settings</Link>
+                    </div>
+                    <div className="customer-nav-account">
+                        <span className="customer-avatar" aria-hidden="true">{initials}</span>
+                        <div className="customer-nav-name">
+                            <strong>{user?.name || 'Customer'}</strong>
+                            <small>Customer workspace</small>
+                        </div>
+                        <button type="button" className="customer-nav-signout" onClick={handleLogout} aria-label="Sign out" title="Sign out">
+                            <LogOut size={17} strokeWidth={2.2} />
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <main className="customer-dashboard-main">
             <div className="dashboard-header">
                 <div>
-                    <h1>Welcome back, {user?.name}!</h1>
+                    <span className="customer-eyebrow">CUSTOMER / 01</span>
+                    <h1>Your rentals,<br /><span>in one place.</span></h1>
                     <p className="header-subtitle">Manage your rentals and orders</p>
                 </div>
-                <button onClick={handleLogout} className="logout-btn">
-                    Logout
-                </button>
             </div>
 
             {/* Stats Cards */}
@@ -217,6 +247,7 @@ const CustomerDashboard = () => {
                     </div>
                 )}
             </div>
+            </main>
         </div>
     );
 };
