@@ -63,11 +63,11 @@ const VendorInvoice = () => {
             <nav className="top-nav">
                 <div className="nav-container">
                     <div className="nav-left">
-                        <Link to="/dashboard" className="logo" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <Link to="/vendor/dashboard" className="logo" style={{ textDecoration: 'none', color: 'inherit' }}>
                             <h1>RentFlow</h1>
                         </Link>
                         <div className="nav-tabs">
-                            <Link to="/dashboard" className="nav-tab" style={{ textDecoration: 'none' }}>Dashboard</Link>
+                            <Link to="/vendor/dashboard" className="nav-tab" style={{ textDecoration: 'none' }}>Dashboard</Link>
                             <Link to="/vendor/orders" className="nav-tab active" style={{ textDecoration: 'none' }}>Orders</Link>
                             <button className="nav-tab">Products</button>
                             <button className="nav-tab">Reports</button>

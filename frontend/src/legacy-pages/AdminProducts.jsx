@@ -139,7 +139,7 @@ const AdminProducts = () => {
                             key={category}
                             onClick={() => setFilterCategory(category)}
                             style={{
-                                background: filterCategory === category ? 'var(--primary-color)' : 'transparent',
+                                background: filterCategory === category ? 'var(--primary)' : 'transparent',
                                 color: filterCategory === category ? 'white' : 'var(--text)',
                                 border: 'none',
                                 padding: '0.5rem 1rem',
@@ -241,7 +241,7 @@ const AdminProducts = () => {
                                                 <td style={{ padding: '1rem', fontSize: '0.875rem', fontWeight: 500 }}>
                                                     {product.brand}
                                                 </td>
-                                                <td style={{ padding: '1rem', fontWeight: 600, color: 'var(--primary-color)' }}>
+                                                <td style={{ padding: '1rem', fontWeight: 600, color: 'var(--accent)' }}>
                                                     {formatCurrency(product.price)}
                                                 </td>
                                                 <td style={{ padding: '1rem' }}>

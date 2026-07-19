@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
 
-:root {
+.admin-dashboard-page-dark {
     --primary: #dc2626;
     --primary-hover: #b91c1c;
     --secondary: #ef4444;
@@ -418,7 +418,7 @@
 }
 
 /* Editorial admin system — shared by the admin workspace. */
-:root {
+.admin-dashboard-page {
     --primary: #111111;
     --primary-hover: #2b2b2b;
     --secondary: #d94841;

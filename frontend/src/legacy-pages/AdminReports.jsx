@@ -104,7 +104,7 @@ const AdminReports = () => {
                 }}>
                     <div style={{ background: 'var(--card-bg)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                         <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Total Revenue</div>
-                        <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary-color)' }}>
+                        <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--accent)' }}>
                             {formatCurrency(dummyData.stats.totalRevenue)}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: '#10b981', marginTop: '0.5rem' }}>↑ 24% from last period</div>
@@ -137,7 +137,7 @@ const AdminReports = () => {
                                     <div
                                         style={{
                                             width: '100%',
-                                            background: 'linear-gradient(180deg, var(--primary-color), var(--accent))',
+                                            background: 'linear-gradient(180deg, var(--accent), var(--accent-warm))',
                                             borderRadius: '4px 4px 0 0',
                                             height: `${heightPercent}%`,
                                             minHeight: '20px',
@@ -169,7 +169,7 @@ const AdminReports = () => {
                                         <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{product.name}</div>
                                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{product.rentals} rentals</div>
                                     </div>
-                                    <div style={{ fontWeight: 700, color: 'var(--primary-color)' }}>
+                                    <div style={{ fontWeight: 700, color: 'var(--accent)' }}>
                                         {formatCurrency(product.revenue)}
                                     </div>
                                 </div>
@@ -187,7 +187,7 @@ const AdminReports = () => {
                                         <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{vendor.name}</div>
                                         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{vendor.orders} orders</div>
                                     </div>
-                                    <div style={{ fontWeight: 700, color: 'var(--primary-color)' }}>
+                                    <div style={{ fontWeight: 700, color: 'var(--accent)' }}>
                                         {formatCurrency(vendor.revenue)}
                                     </div>
                                 </div>
@@ -216,7 +216,7 @@ const AdminReports = () => {
                                         <tr key={idx} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                             <td style={{ padding: '0.75rem', fontWeight: 500 }}>{cat.category}</td>
                                             <td style={{ padding: '0.75rem', color: 'var(--text-muted)' }}>{cat.count}</td>
-                                            <td style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--primary-color)' }}>
+                                            <td style={{ padding: '0.75rem', fontWeight: 600, color: 'var(--accent)' }}>
                                                 {formatCurrency(cat.revenue)}
                                             </td>
                                             <td style={{ padding: '0.75rem' }}>
@@ -231,7 +231,7 @@ const AdminReports = () => {
                                                         <div style={{
                                                             width: `${percent}%`,
                                                             height: '100%',
-                                                            background: 'var(--primary-color)',
+                                                            background: 'var(--accent)',
                                                             borderRadius: '4px'
                                                         }} />
                                                     </div>

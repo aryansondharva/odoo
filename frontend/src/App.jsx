@@ -62,8 +62,8 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
 const DashboardRouter = () => {
     const { user } = useAuth();
-    if (user?.role === 'ADMIN') return <AdminDashboard />;
-    if (user?.role === 'VENDOR') return <VendorDashboard />;
+    if (user?.role === 'ADMIN') return <Navigate to="/admin/dashboard" replace />;
+    if (user?.role === 'VENDOR') return <Navigate to="/vendor/dashboard" replace />;
     return <Dashboard />;
 };
 
@@ -167,7 +167,7 @@ function App() {
                                     <Route
                                         path="/customer/dashboard"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="CUSTOMER">
                                                 <CustomerDashboard />
                                             </ProtectedRoute>
                                         }
@@ -175,7 +175,7 @@ function App() {
                                     <Route
                                         path="/customer/orders"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="CUSTOMER">
                                                 <CustomerOrders />
                                             </ProtectedRoute>
                                         }
@@ -183,7 +183,7 @@ function App() {
                                     <Route
                                         path="/customer/orders/:id"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="CUSTOMER">
                                                 <CustomerOrderDetail />
                                             </ProtectedRoute>
                                         }
@@ -201,7 +201,7 @@ function App() {
                                     <Route
                                         path="/vendor/dashboard"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="VENDOR">
                                                 <VendorDashboard />
                                             </ProtectedRoute>
                                         }
@@ -209,7 +209,7 @@ function App() {
                                     <Route
                                         path="/vendor/orders"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="VENDOR">
                                                 <VendorOrders />
                                             </ProtectedRoute>
                                         }
@@ -217,7 +217,7 @@ function App() {
                                     <Route
                                         path="/vendor/profile"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="VENDOR">
                                                 <VendorProfile />
                                             </ProtectedRoute>
                                         }
@@ -225,7 +225,7 @@ function App() {
                                     <Route
                                         path="/vendor/orders/new"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="VENDOR">
                                                 <VendorNewOrder />
                                             </ProtectedRoute>
                                         }
@@ -233,7 +233,7 @@ function App() {
                                     <Route
                                         path="/vendor/invoice/:id"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="VENDOR">
                                                 <VendorInvoice />
                                             </ProtectedRoute>
                                         }
@@ -241,7 +241,7 @@ function App() {
                                     <Route
                                         path="/vendor/products"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="VENDOR">
                                                 <VendorProducts />
                                             </ProtectedRoute>
                                         }
@@ -249,7 +249,7 @@ function App() {
                                     <Route
                                         path="/vendor/products/new"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="VENDOR">
                                                 <VendorProduct />
                                             </ProtectedRoute>
                                         }
@@ -257,7 +257,7 @@ function App() {
                                     <Route
                                         path="/vendor/products/:id"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="VENDOR">
                                                 <VendorProduct />
                                             </ProtectedRoute>
                                         }
@@ -265,7 +265,7 @@ function App() {
                                     <Route
                                         path="/vendor/reports"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="VENDOR">
                                                 <VendorReports />
                                             </ProtectedRoute>
                                         }
@@ -273,7 +273,7 @@ function App() {
                                     <Route
                                         path="/vendor/settings"
                                         element={
-                                            <ProtectedRoute>
+                                            <ProtectedRoute requiredRole="VENDOR">
                                                 <VendorSettings />
                                             </ProtectedRoute>
                                         }

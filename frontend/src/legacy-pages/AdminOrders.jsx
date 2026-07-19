@@ -123,7 +123,7 @@ const AdminOrders = () => {
                             key={status}
                             onClick={() => setFilterStatus(status)}
                             style={{
-                                background: filterStatus === status ? 'var(--primary-color)' : 'transparent',
+                                background: filterStatus === status ? 'var(--primary)' : 'transparent',
                                 color: filterStatus === status ? 'white' : 'var(--text)',
                                 border: 'none',
                                 padding: '0.5rem 1rem',
@@ -199,7 +199,7 @@ const AdminOrders = () => {
                                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                             >
                                                 <td style={{ padding: '1rem' }}>
-                                                    <span style={{ fontWeight: 600, color: 'var(--primary-color)' }}>
+                                                    <span style={{ fontWeight: 600, color: 'var(--accent)' }}>
                                                         {order.orderNumber}
                                                     </span>
                                                 </td>
@@ -238,7 +238,7 @@ const AdminOrders = () => {
                                                     <Link
                                                         to={`/customer/orders/${order.id}`}
                                                         style={{
-                                                            color: 'var(--primary-color)',
+                                                            color: 'var(--accent)',
                                                             textDecoration: 'none',
                                                             fontSize: '0.875rem',
                                                             fontWeight: 500

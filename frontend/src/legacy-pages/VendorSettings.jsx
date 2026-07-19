@@ -122,11 +122,11 @@ const VendorSettings = () => {
             <nav className="top-nav">
                 <div className="nav-container">
                     <div className="nav-left">
-                        <Link to="/dashboard" className="logo" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <Link to="/vendor/dashboard" className="logo" style={{ textDecoration: 'none', color: 'inherit' }}>
                             <h1>RentFlow</h1>
                         </Link>
                         <div className="nav-tabs">
-                            <Link to="/dashboard" className="nav-tab" style={{ textDecoration: 'none' }}>Dashboard</Link>
+                            <Link to="/vendor/dashboard" className="nav-tab" style={{ textDecoration: 'none' }}>Dashboard</Link>
                             <Link to="/vendor/orders" className="nav-tab" style={{ textDecoration: 'none' }}>Orders</Link>
                             <Link to="/vendor/products" className="nav-tab" style={{ textDecoration: 'none' }}>Products</Link>
                             <Link to="/vendor/reports" className="nav-tab" style={{ textDecoration: 'none' }}>Reports</Link>

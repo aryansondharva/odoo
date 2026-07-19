@@ -59,11 +59,11 @@ const VendorReports = () => {
             <nav className="top-nav">
                 <div className="nav-container">
                     <div className="nav-left">
-                        <Link to="/dashboard" className="logo" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <Link to="/vendor/dashboard" className="logo" style={{ textDecoration: 'none', color: 'inherit' }}>
                             <h1>RentFlow</h1>
                         </Link>
                         <div className="nav-tabs">
-                            <Link to="/dashboard" className="nav-tab" style={{ textDecoration: 'none' }}>Dashboard</Link>
+                            <Link to="/vendor/dashboard" className="nav-tab" style={{ textDecoration: 'none' }}>Dashboard</Link>
                             <Link to="/vendor/orders" className="nav-tab" style={{ textDecoration: 'none' }}>Orders</Link>
                             <Link to="/vendor/products" className="nav-tab" style={{ textDecoration: 'none' }}>Products</Link>
                             <Link to="/vendor/reports" className="nav-tab active" style={{ textDecoration: 'none' }}>Reports</Link>
@@ -111,7 +111,7 @@ const VendorReports = () => {
                     <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
                         <div className="stat-card" style={{ background: 'var(--card-bg)', padding: '1.5rem', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                             <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>Total Revenue</div>
-                            <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--primary-color)' }}>
+                            <div style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--accent)' }}>
                                 {formatCurrency(reportsData.stats.totalRevenue)}
                             </div>
                         </div>
