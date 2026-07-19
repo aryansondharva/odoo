@@ -78,6 +78,9 @@ function App() {
                                 <Routes>
                                     <Route path="/" element={<Index />} />
                                     <Route path="/login" element={<Login />} />
+                                    <Route path="/admin/login" element={<Login expectedRole="ADMIN" />} />
+                                    <Route path="/vendor/login" element={<Login expectedRole="VENDOR" />} />
+                                    <Route path="/customer/login" element={<Login expectedRole="CUSTOMER" />} />
                                     <Route path="/signup" element={<Signup />} />
                                     <Route path="/forgot-password" element={<ForgotPassword />} />
                                     <Route path="/reset-password" element={<ResetPassword />} />

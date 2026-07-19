@@ -25,6 +25,8 @@ const CustomerOrders = () => {
             CONFIRMED: 'bg-indigo-500',
             PAID: 'bg-green-500',
             PICKED_UP: 'bg-purple-500',
+            ACTIVE: 'bg-amber-500',
+            OVERDUE: 'bg-red-500',
             RETURNED: 'bg-teal-500',
             CANCELLED: 'bg-red-500',
         };
@@ -59,12 +61,17 @@ const CustomerOrders = () => {
                                         <div key={item.id} className="order-item">
                                             <span>{item.product.name} (x{item.quantity})</span>
                                             <span>{new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}</span>
-                                            <span>R{item.price}</span>
+                                            <span>₹{item.price}</span>
                                         </div>
                                     ))}
                                 </div>
+                                {Number(order.lateFee || 0) > 0 && (
+                                    <div className="penalty-info" style={{ color: 'var(--accent)', fontSize: '0.9rem', marginTop: '0.5rem', fontWeight: 'bold' }}>
+                                        ⚠️ Overdue Penalty Added: ₹{Number(order.lateFee).toLocaleString()}
+                                    </div>
+                                )}
                                 <div className="order-footer">
-                                    <div className="total-amount">Total: R{order.totalAmount}</div>
+                                    <div className="total-amount">Total: ₹{order.totalAmount}</div>
                                     {order.status === 'CONFIRMED' || order.status === 'SALES_ORDER' ? (
                                         <button className="btn btn-pay" onClick={() => alert('Redirect to Payment Gateway...')}>Pay Now</button>
                                     ) : null}

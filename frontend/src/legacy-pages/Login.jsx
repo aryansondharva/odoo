@@ -28,15 +28,18 @@ if (typeof document !== 'undefined' && !document.getElementById('rf-login-kf')) 
     document.head.appendChild(s);
 }
 
-const Login = () => {
+const Login = ({ expectedRole = null }) => {
     const [formData, setFormData] = useState({ email: '', password: '', remember: false });
     const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const { login, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const successMessage = location.state?.message;
+    const roleLabel = expectedRole
+        ? `${expectedRole.charAt(0)}${expectedRole.slice(1).toLowerCase()}`
+        : null;
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -54,7 +57,20 @@ const Login = () => {
         const result = await login(formData.email, formData.password);
         setLoading(false);
         if (result.success) {
-            navigate('/dashboard');
+            const signedInRole = result.user?.role?.toUpperCase();
+
+            if (expectedRole && signedInRole !== expectedRole) {
+                logout();
+                setErrors({ server: `This account does not have ${roleLabel} access.` });
+                return;
+            }
+
+            const dashboardPath = signedInRole === 'ADMIN'
+                ? '/admin/dashboard'
+                : signedInRole === 'VENDOR'
+                    ? '/vendor/dashboard'
+                    : '/customer/dashboard';
+            navigate(dashboardPath, { replace: true });
         } else if (result.requiresEmailVerification) {
             navigate('/verify-email', { state: { email: result.email, message: result.message } });
         } else {
@@ -115,8 +131,8 @@ const Login = () => {
             <div style={S.rightPanel}>
                 <div style={S.formCard}>
                     <div style={S.formHeader}>
-                        <h2 style={S.formTitle}>Welcome back</h2>
-                        <p style={S.formSubtitle}>Sign in to your account to continue</p>
+                        <h2 style={S.formTitle}>{roleLabel ? `${roleLabel} sign in` : 'Welcome back'}</h2>
+                        <p style={S.formSubtitle}>{roleLabel ? `Sign in with your ${roleLabel.toLowerCase()} account to continue` : 'Sign in to your account to continue'}</p>
                     </div>
 
                     {successMessage && (

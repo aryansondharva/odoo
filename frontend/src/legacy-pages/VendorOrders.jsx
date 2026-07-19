@@ -130,7 +130,7 @@ const VendorOrders = () => {
             const res = await api.post(`/orders/${orderId}/pickup`);
             if (res.data.success) {
                 alert("Order Picked Up! Stock updated.");
-                setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'PICKED_UP' } : o));
+                setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'ACTIVE' } : o));
             }
         } catch (error) {
             console.error("Pickup Error", error);
@@ -145,7 +145,7 @@ const VendorOrders = () => {
             if (res.data.success) {
                 const lateFee = res.data.lateFee;
                 let msg = "Order Returned! Stock restored.";
-                if (lateFee > 0) msg += `\nLate Fee Applied: R${Number(lateFee).toFixed(2)}`;
+                if (lateFee > 0) msg += `\nLate Fee Applied: ₹${Number(lateFee).toFixed(2)}`;
 
                 alert(msg);
                 setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: 'RETURNED', lateFee: lateFee } : o));
@@ -412,10 +412,10 @@ const VendorOrders = () => {
                                         {order.items?.length > 1 && ` (+${order.items.length - 1})`}
                                     </div>
                                     <div className="card-price">
-                                        R{Number(order.totalAmount).toFixed(2)}
+                                        ₹{Number(order.totalAmount).toFixed(2)}
                                         {Number(order.lateFee) > 0 && (
-                                            <div style={{ color: 'var(--accent)', fontSize: '0.75rem', marginTop: '2px' }}>
-                                                + Late Fee: R{Number(order.lateFee).toFixed(2)}
+                                            <div style={{ color: 'var(--accent)', fontSize: '0.75rem', marginTop: '2px', fontWeight: 'bold' }}>
+                                                + Late Penalty: ₹{Number(order.lateFee).toFixed(2)}
                                             </div>
                                         )}
                                     </div>
@@ -467,7 +467,7 @@ const VendorOrders = () => {
                                         )}
 
                                         {/* Return Action */}
-                                        {isVendor && order.status === 'PICKED_UP' && (
+                                        {isVendor && (order.status === 'ACTIVE' || order.status === 'OVERDUE') && (
                                             <div style={{ display: "flex", gap: "0.5rem" }}>
                                                 <button className="btn-confirm" onClick={() => handleReturn(order.id)} style={{ padding: '4px 8px', fontSize: '0.75rem', background: 'var(--success)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
                                                     Return
@@ -530,7 +530,7 @@ const VendorOrders = () => {
                                             <td>{new Date(order.createdAt).toLocaleDateString()}</td>
                                             <td>{order.user?.name || 'Unknown'}</td>
                                             <td>{order.items?.[0]?.product?.name || 'Multiple Items'} {order.items?.length > 1 ? `+${order.items.length - 1} more` : ''}</td>
-                                            <td>R{Number(order.totalAmount).toFixed(2)}</td>
+                                            <td>₹{Number(order.totalAmount).toFixed(2)}</td>
                                             <td>
                                                 <span className={`status-badge status-${order.status.toLowerCase().replace('_', '-')}`}>
                                                     {order.status.replace('_', ' ')}
@@ -547,7 +547,13 @@ const VendorOrders = () => {
                                                     <button onClick={() => handlePayOrder(order.id)} style={{ fontSize: '0.8rem', cursor: 'pointer', color: 'var(--accent)' }}>Pay Now</button>
                                                 )}
                                                 {order.status === 'PAID' && (
-                                                    <button onClick={() => handlePrintInvoice(order.id)} style={{ fontSize: '0.8rem', cursor: 'pointer' }}>Invoice</button>
+                                                    <div style={{ display: 'inline-flex', gap: '4px' }}>
+                                                        {isVendor && <button onClick={() => handlePickup(order.id)} style={{ fontSize: '0.8rem', cursor: 'pointer', color: 'var(--accent-warm)' }}>Pickup</button>}
+                                                        <button onClick={() => handlePrintInvoice(order.id)} style={{ fontSize: '0.8rem', cursor: 'pointer' }}>Invoice</button>
+                                                    </div>
+                                                )}
+                                                {isVendor && (order.status === 'ACTIVE' || order.status === 'OVERDUE') && (
+                                                    <button onClick={() => handleReturn(order.id)} style={{ fontSize: '0.8rem', cursor: 'pointer', color: 'var(--success)' }}>Return</button>
                                                 )}
                                             </td>
                                         </tr>

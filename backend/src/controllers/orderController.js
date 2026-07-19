@@ -168,9 +168,9 @@ const getOrders = async (req, res) => {
         if (role !== 'VENDOR' && role !== 'ADMIN') {
             queryOptions.where = { userId };
         }
-
         const orders = await prisma.order.findMany(queryOptions);
-        res.status(200).json({ success: true, count: orders.length, data: orders });
+        const processedOrders = await Promise.all(orders.map(o => checkAndUpdateOverdue(o)));
+        res.status(200).json({ success: true, count: processedOrders.length, data: processedOrders });
     } catch (error) {
         console.error("Get Orders Error", error);
         res.status(500).json({ success: false, message: 'Failed to fetch orders' });
@@ -191,11 +191,12 @@ const getOrder = async (req, res) => {
         }
 
         // Authorization check: ensure order belongs to user
-        if (order.userId !== userId && req.user.role !== 'ADMIN') {
+        if (order.userId !== userId && req.user.role !== 'ADMIN' && req.user.role !== 'VENDOR') {
             return res.status(403).json({ success: false, message: 'Not authorized to view this order' });
         }
 
-        res.status(200).json({ success: true, data: order });
+        const processedOrder = await checkAndUpdateOverdue(order);
+        res.status(200).json({ success: true, data: processedOrder });
     } catch (error) {
         console.error("Get Order Error", error);
         res.status(500).json({ success: false, message: 'Failed to fetch order' });
@@ -594,14 +595,133 @@ const verifyRazorpayPayment = async (req, res) => {
     } catch (error) {
         console.error('Razorpay verification error:', error.message);
         return res.status(500).json({ success: false, message: error.message || 'Could not verify Razorpay payment.' });
+    try {
+        const cart = await cartService.getOrCreateCart(req.user.userId);
+        if (!cart.items.length) return res.status(400).json({ success: false, message: 'Your cart is empty.' });
+
+        const deliveryAddress = req.body?.deliveryAddress?.trim() || null;
+        const billingAddress = req.body?.billingAddress?.trim() || deliveryAddress;
+        const orderNumber = `SO${Date.now().toString().slice(-6)}`;
+        const order = await prisma.$transaction(async (tx) => {
+            const createdOrder = await tx.order.create({
+                data: {
+                    userId: req.user.userId,
+                    orderNumber,
+                    totalAmount: cart.total,
+                    untaxedAmount: cart.total,
+                    discountAmount: cart.discountAmount || 0,
+                    deliveryAddress,
+                    billingAddress,
+                    status: 'SALES_ORDER',
+                    lockedTotalAmount: cart.total,
+                    priceLockedAt: new Date(),
+                    renterAcceptedAt: new Date(),
+                    items: {
+                        create: cart.items.map((item) => ({
+                            productId: item.productId,
+                            quantity: item.quantity,
+                            price: item.product.price,
+                            startDate: item.startDate ? new Date(item.startDate) : null,
+                            endDate: item.endDate ? new Date(item.endDate) : null
+                        }))
+                    }
+                },
+                include: { invoice: true }
+            });
+            await tx.invoice.create({
+                data: { orderId: createdOrder.id, amount: cart.total, status: 'UNPAID', method: 'COD' }
+            });
+            await tx.cart.delete({ where: { userId: req.user.userId } });
+            return createdOrder;
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'COD order placed successfully.',
+            orderId: order.id,
+            data: order
+        });
+    } catch (error) {
+        console.error('COD checkout error:', error.message);
+        res.status(500).json({ success: false, message: error.message || 'Could not place COD order.' });
     }
+};
+
+const verifyRazorpayPayment = async (req, res) => {
+    try {
+        const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+        if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) return res.status(400).json({ success: false, message: 'Incomplete Razorpay payment response.' });
+        const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '')
+            .update(`${razorpay_order_id}|${razorpay_payment_id}`).digest('hex');
+        if (!crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(razorpay_signature))) return res.status(400).json({ success: false, message: 'Razorpay payment verification failed.' });
+
+        const [order, razorpayOrder] = await Promise.all([
+            prisma.order.findUnique({ where: { id: req.params.id }, include: { invoice: true } }),
+            razorpayRequest(`/v1/orders/${razorpay_order_id}`)
+        ]);
+        if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+        if (order.userId !== req.user.userId && req.user.role !== 'ADMIN') return res.status(403).json({ success: false, message: 'Not authorized to pay this order' });
+        if (!order.invoice || razorpayOrder.notes?.rentflowOrderId !== order.id || razorpayOrder.amount !== Math.round(Number(order.invoice.amount) * 100)) return res.status(400).json({ success: false, message: 'Payment does not match this invoice.' });
+
+        req.body.method = 'RAZORPAY_TEST';
+        return payOrder(req, res);
+    } catch (error) {
+        console.error('Razorpay verification error:', error.message);
+        return res.status(500).json({ success: false, message: error.message || 'Could not verify Razorpay payment.' });
+    }
+};
+
+const checkAndUpdateOverdue = async (order) => {
+    if (!order) return order;
+    if (order.status !== 'ACTIVE' && order.status !== 'OVERDUE') {
+        return order;
+    }
+
+    const now = new Date();
+    let isOverdue = false;
+    let totalPenalty = 0;
+
+    for (const item of order.items) {
+        if (item.endDate && now > new Date(item.endDate)) {
+            isOverdue = true;
+            const endDate = new Date(item.endDate);
+            const diffTime = now - endDate;
+            const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+            if (diffDays > 0) {
+                const lateFeeRate = Number(item.product?.lateFeeRate || 0);
+                const penalty = diffDays * lateFeeRate * item.quantity;
+                totalPenalty += penalty;
+            }
+        }
+    }
+
+    if (isOverdue && order.status === 'ACTIVE') {
+        return await prisma.order.update({
+            where: { id: order.id },
+            data: { status: 'OVERDUE', lateFee: totalPenalty },
+            include: { items: { include: { product: true } } }
+        });
+    } else if (!isOverdue && order.status === 'OVERDUE') {
+        return await prisma.order.update({
+            where: { id: order.id },
+            data: { status: 'ACTIVE', lateFee: 0 },
+            include: { items: { include: { product: true } } }
+        });
+    } else if (isOverdue && order.status === 'OVERDUE') {
+        return await prisma.order.update({
+            where: { id: order.id },
+            data: { lateFee: totalPenalty },
+            include: { items: { include: { product: true } } }
+        });
+    }
+
+    return order;
 };
 
 const pickupOrder = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Transaction: Update status and Decrement Stock
         const updatedOrder = await prisma.$transaction(async (prisma) => {
             const order = await prisma.order.findUnique({
                 where: { id },
@@ -621,11 +741,11 @@ const pickupOrder = async (req, res) => {
 
             return await prisma.order.update({
                 where: { id },
-                data: { status: 'PICKED_UP' }
+                data: { status: 'ACTIVE' }
             });
         });
 
-        res.status(200).json({ success: true, message: 'Order picked up. Stock updated.', data: updatedOrder });
+        res.status(200).json({ success: true, message: 'Order picked up and is now ACTIVE.', data: updatedOrder });
     } catch (error) {
         console.error('Pickup Error:', error);
         res.status(error.message === 'Order not found' ? 404 : 400).json({
@@ -646,7 +766,7 @@ const returnOrder = async (req, res) => {
             });
 
             if (!order) throw new Error('Order not found');
-            if (order.status !== 'PICKED_UP') throw new Error('Order must be picked up before return.');
+            if (order.status !== 'ACTIVE' && order.status !== 'OVERDUE') throw new Error('Order must be active or overdue before return.');
 
             // Increment Stock
             for (const item of order.items) {
@@ -656,37 +776,40 @@ const returnOrder = async (req, res) => {
                 });
             }
 
-            // Calculate Late Fee
+            // Calculate Penalty
             let totalLateFee = 0;
             const now = new Date();
 
             for (const item of order.items) {
                 if (item.endDate && now > new Date(item.endDate)) {
-                    // Simple logic: Full daily rate per overdue day
                     const endDate = new Date(item.endDate);
-                    const diffTime = Math.abs(now - endDate);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const diffTime = now - endDate;
+                    const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 
                     if (diffDays > 0) {
-                        const dailyRate = Number(item.price); // Assuming price is basically daily rate roughly
-                        const fee = dailyRate * item.quantity * diffDays;
+                        const lateFeeRate = Number(item.product?.lateFeeRate || 0);
+                        const fee = lateFeeRate * item.quantity * diffDays;
                         totalLateFee += fee;
                     }
                 }
             }
 
+            const originalTotal = Number(order.totalAmount);
+            const finalTotal = originalTotal + totalLateFee;
+
             return await prisma.order.update({
                 where: { id },
                 data: {
                     status: 'RETURNED',
-                    lateFee: totalLateFee
+                    lateFee: totalLateFee,
+                    totalAmount: finalTotal
                 }
             });
         });
 
         res.status(200).json({
             success: true,
-            message: 'Order returned. Stock restored.',
+            message: 'Order returned. Stock restored and late fees finalized.',
             data: updatedOrder,
             lateFee: updatedOrder.lateFee
         });
