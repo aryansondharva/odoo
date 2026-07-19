@@ -593,83 +593,7 @@ const verifyRazorpayPayment = async (req, res) => {
         req.body.method = 'RAZORPAY_TEST';
         return payOrder(req, res);
     } catch (error) {
-        console.error('Razorpay verification error:', error.message);
-        return res.status(500).json({ success: false, message: error.message || 'Could not verify Razorpay payment.' });
-    try {
-        const cart = await cartService.getOrCreateCart(req.user.userId);
-        if (!cart.items.length) return res.status(400).json({ success: false, message: 'Your cart is empty.' });
-
-        const deliveryAddress = req.body?.deliveryAddress?.trim() || null;
-        const billingAddress = req.body?.billingAddress?.trim() || deliveryAddress;
-        const orderNumber = `SO${Date.now().toString().slice(-6)}`;
-        const order = await prisma.$transaction(async (tx) => {
-            const createdOrder = await tx.order.create({
-                data: {
-                    userId: req.user.userId,
-                    orderNumber,
-                    totalAmount: cart.total,
-                    untaxedAmount: cart.total,
-                    discountAmount: cart.discountAmount || 0,
-                    deliveryAddress,
-                    billingAddress,
-                    status: 'SALES_ORDER',
-                    lockedTotalAmount: cart.total,
-                    priceLockedAt: new Date(),
-                    renterAcceptedAt: new Date(),
-                    items: {
-                        create: cart.items.map((item) => ({
-                            productId: item.productId,
-                            quantity: item.quantity,
-                            price: item.product.price,
-                            startDate: item.startDate ? new Date(item.startDate) : null,
-                            endDate: item.endDate ? new Date(item.endDate) : null
-                        }))
-                    }
-                },
-                include: { invoice: true }
-            });
-            await tx.invoice.create({
-                data: { orderId: createdOrder.id, amount: cart.total, status: 'UNPAID', method: 'COD' }
-            });
-            await tx.cart.delete({ where: { userId: req.user.userId } });
-            return createdOrder;
-        });
-
-        res.status(201).json({
-            success: true,
-            message: 'COD order placed successfully.',
-            orderId: order.id,
-            data: order
-        });
-    } catch (error) {
-        console.error('COD checkout error:', error.message);
-        res.status(500).json({ success: false, message: error.message || 'Could not place COD order.' });
-    }
-};
-
-const verifyRazorpayPayment = async (req, res) => {
-    try {
-        const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
-        if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) return res.status(400).json({ success: false, message: 'Incomplete Razorpay payment response.' });
-        const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '')
-            .update(`${razorpay_order_id}|${razorpay_payment_id}`).digest('hex');
-        if (!crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(razorpay_signature))) return res.status(400).json({ success: false, message: 'Razorpay payment verification failed.' });
-
-        const [order, razorpayOrder] = await Promise.all([
-            prisma.order.findUnique({ where: { id: req.params.id }, include: { invoice: true } }),
-            razorpayRequest(`/v1/orders/${razorpay_order_id}`)
-        ]);
-        if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
-        if (order.userId !== req.user.userId && req.user.role !== 'ADMIN') return res.status(403).json({ success: false, message: 'Not authorized to pay this order' });
-        if (!order.invoice || razorpayOrder.notes?.rentflowOrderId !== order.id || razorpayOrder.amount !== Math.round(Number(order.invoice.amount) * 100)) return res.status(400).json({ success: false, message: 'Payment does not match this invoice.' });
-
-        req.body.method = 'RAZORPAY_TEST';
-        return payOrder(req, res);
-    } catch (error) {
-        console.error('Razorpay verification error:', error.message);
-        return res.status(500).json({ success: false, message: error.message || 'Could not verify Razorpay payment.' });
-    }
-};
+        console.error('Razorpay verification error:', error.message);;
 
 const checkAndUpdateOverdue = async (order) => {
     if (!order) return order;
