@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { SearchProvider } from './context/SearchContext';
 import { WishlistProvider } from './context/WishlistContext';
+import { DialogProvider } from './context/DialogContext';
 import Index from './legacy-pages/Index';
 import Login from './legacy-pages/Login';
 import Signup from './legacy-pages/Signup';
@@ -76,6 +77,7 @@ function App() {
             <CartProvider>
                 <SearchProvider>
                     <WishlistProvider>
+                        <DialogProvider>
                         <div className="w-full min-h-screen bg-gray-50 flex flex-col">
                             <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
                                 <Routes>
@@ -335,6 +337,7 @@ function App() {
                                 </Routes>
                             </Suspense>
                         </div>
+                        </DialogProvider>
                     </WishlistProvider>
                 </SearchProvider>
             </CartProvider>

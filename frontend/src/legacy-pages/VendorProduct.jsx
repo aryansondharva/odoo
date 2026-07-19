@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import { useDialog } from '../context/DialogContext';
 import './VendorProduct.css';
 
 const VendorProduct = () => {
+    const { showNotice } = useDialog();
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const { id } = useParams();
@@ -59,7 +61,7 @@ const VendorProduct = () => {
             }
         } catch (error) {
             console.error("Error fetching product:", error);
-            alert("Failed to load product details.");
+            showNotice({ title: 'Product could not be loaded', description: 'Please try again in a moment.' });
         }
     };
 
@@ -156,15 +158,15 @@ const VendorProduct = () => {
             }
 
             if (res.data.success) {
-                alert(`Product ${isEditMode ? 'updated' : 'created'} successfully!`);
+                showNotice({ title: `Product ${isEditMode ? 'updated' : 'created'}`, description: 'Your catalogue changes have been saved successfully.' });
                 navigate('/vendor/dashboard'); // or back to list
             } else {
-                alert('Failed to save product: ' + res.data.message);
+                showNotice({ title: 'Product could not be saved', description: res.data.message || 'Please try again in a moment.' });
             }
         } catch (error) {
             console.error("Save Product Error:", error);
             const errMsg = error.response?.data?.message || error.response?.data?.error || error.message;
-            alert('Error saving product: ' + errMsg);
+            showNotice({ title: 'Product could not be saved', description: errMsg || 'Please try again in a moment.' });
         }
     };
 

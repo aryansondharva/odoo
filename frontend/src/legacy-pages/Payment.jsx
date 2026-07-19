@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import api from '../api/client';
+import { useDialog } from '../context/DialogContext';
 import './Payment.css';
 
 const Payment = () => {
@@ -13,6 +14,7 @@ const Payment = () => {
     const { user, logout } = useAuth();
     const { cartItems, getCartTotal, getCartCount, clearCart, rentalPeriod } = useCart();
     const { wishlist } = useWishlist();
+    const { showNotice } = useDialog();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [saveDetails, setSaveDetails] = useState(false);
     const [order, setOrder] = useState(null);
@@ -40,12 +42,12 @@ const Payment = () => {
                 console.log('Order loaded:', response.data.data);
             } else {
                 console.error('Order fetch failed:', response.data.message);
-                alert('Failed to load order: ' + response.data.message);
+                showNotice({ title: 'Order could not be loaded', description: response.data.message || 'Please try again.' });
             }
         } catch (error) {
             console.error('Failed to fetch order:', error);
             console.error('Error details:', error.response?.data);
-            alert('Failed to load order details: ' + (error.response?.data?.message || error.message));
+            showNotice({ title: 'Order could not be loaded', description: error.response?.data?.message || error.message || 'Please try again.' });
         } finally {
             setLoading(false);
         }
@@ -64,7 +66,7 @@ const Payment = () => {
         e.preventDefault();
 
         if (!orderId && !deliveryAddress.trim()) {
-            alert('Enter and save a delivery address before continuing to payment.');
+            showNotice({ title: 'Delivery address needed', description: 'Enter and save a delivery address before continuing to payment.' });
             navigate('/address');
             return;
         }
@@ -75,10 +77,10 @@ const Payment = () => {
                 const response = await api.post(`/orders/${orderId}/pay`);
 
                 if (response.data.success) {
-                    alert(response.data.message || 'Payment successful! Your invoice receipt has been emailed.');
+                    showNotice({ title: 'Payment successful', description: response.data.message || 'Your invoice receipt is ready.' });
                     navigate(`/customer/orders/${orderId}`);
                 } else {
-                    alert('Payment failed: ' + response.data.message);
+                    showNotice({ title: 'Payment failed', description: response.data.message || 'Please check your details and try again.' });
                 }
             } else {
                 // Create Order from Cart
@@ -95,12 +97,12 @@ const Payment = () => {
                         navigate('/order-success', { state: { order: response.data.data, deliveryAddress } });
                     }, 1500);
                 } else {
-                    alert('Order creation failed: ' + response.data.message);
+                    showNotice({ title: 'Order could not be created', description: response.data.message || 'Please try again.' });
                 }
             }
         } catch (error) {
             console.error('Payment Error:', error);
-            alert('Payment failed. Please try again.');
+            showNotice({ title: 'Payment failed', description: 'Please try again in a moment.' });
         }
     };
 

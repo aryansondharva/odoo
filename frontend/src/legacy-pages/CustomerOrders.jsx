@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/client';
+import { useDialog } from '../context/DialogContext';
 import './CustomerOrders.css'; // We'll create a basic CSS file or reuse styles
 
 const CustomerOrders = () => {
+    const { showNotice } = useDialog();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -66,7 +68,7 @@ const CustomerOrders = () => {
                                 <div className="order-footer">
                                     <div className="total-amount">Total: R{order.totalAmount}</div>
                                     {order.status === 'CONFIRMED' || order.status === 'SALES_ORDER' ? (
-                                        <button className="btn btn-pay" onClick={() => alert('Redirect to Payment Gateway...')}>Pay Now</button>
+                                        <button className="btn btn-pay" onClick={() => showNotice({ title: 'Payment ready', description: 'Open the rental details to continue securely to payment.' })}>Pay Now</button>
                                     ) : null}
                                 </div>
                             </div>

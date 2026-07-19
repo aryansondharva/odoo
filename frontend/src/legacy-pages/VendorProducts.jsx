@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import { useDialog } from '../context/DialogContext';
 import './VendorProducts.css';
 
 const VendorProducts = () => {
+    const { showConfirm, showNotice } = useDialog();
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [products, setProducts] = useState([]);
@@ -45,7 +47,13 @@ const VendorProducts = () => {
 
     const handleDeleteProduct = async (e, productId) => {
         e.stopPropagation();
-        if (!window.confirm("Are you sure you want to delete this product?")) return;
+        const confirmed = await showConfirm({
+            title: 'Delete product',
+            description: 'This product will be removed from your catalogue. This action cannot be undone.',
+            confirmLabel: 'Delete product',
+            tone: 'danger',
+        });
+        if (!confirmed) return;
         try {
             const res = await api.delete(`/products/${productId}`);
             if (res.data.success) {
@@ -53,7 +61,7 @@ const VendorProducts = () => {
             }
         } catch (error) {
             console.error("Delete error", error);
-            alert(error.response?.data?.message || "Failed to delete");
+            showNotice({ title: 'Product could not be deleted', description: error.response?.data?.message || 'Please try again in a moment.' });
         }
     };
 

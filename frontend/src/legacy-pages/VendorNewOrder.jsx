@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import { useDialog } from '../context/DialogContext';
 import './VendorNewOrder.css';
 
 const VendorNewOrder = () => {
+    const { showNotice, showPrompt } = useDialog();
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [status, setStatus] = useState('Quotation');
@@ -116,12 +118,12 @@ const VendorNewOrder = () => {
 
     const handleSaveOrder = async (confirm = false) => {
         if (!selectedCustomer) {
-            alert("Please select a customer.");
+            showNotice({ title: 'Customer required', description: 'Select a customer before saving this order.' });
             return;
         }
 
         if (orderItems.some(item => !item.productId)) {
-            alert("Please select products for all lines.");
+            showNotice({ title: 'Products required', description: 'Select a product for every order line before saving.' });
             return;
         }
 
@@ -147,7 +149,7 @@ const VendorNewOrder = () => {
                 const newOrder = res.data.data;
                 setCreatedOrderId(newOrder.id);
                 setOrderNumber(newOrder.orderNumber);
-                alert(`Order ${newOrder.orderNumber} created successfully!`);
+                showNotice({ title: 'Order created', description: `Order ${newOrder.orderNumber} has been created successfully.` });
 
                 if (confirm) {
                     await handleConfirmOrder(newOrder.id);
@@ -158,7 +160,7 @@ const VendorNewOrder = () => {
         } catch (error) {
             console.error("Create Order Error", error);
             const errMsg = error.response?.data?.error || error.response?.data?.message || error.message;
-            alert("Failed to create order: " + errMsg);
+            showNotice({ title: 'Order could not be created', description: errMsg || 'Please try again in a moment.' });
         }
     };
 
@@ -167,17 +169,17 @@ const VendorNewOrder = () => {
             const res = await api.post(`/orders/${orderId}/confirm`);
             if (res.data.success) {
                 setStatus('Sale Order');
-                alert("Order Confirmed!");
+                showNotice({ title: 'Order confirmed', description: 'The rental is now confirmed and ready for invoicing.' });
             }
         } catch (error) {
             console.error("Confirm Error", error);
-            alert("Failed to confirm order.");
+            showNotice({ title: 'Order could not be confirmed', description: 'Please try again in a moment.' });
         }
     };
 
     const handleCreateInvoice = async () => {
         if (!createdOrderId) {
-            alert("Please save/confirm the order first.");
+            showNotice({ title: 'Save the order first', description: 'Save or confirm this order before creating an invoice.' });
             return;
         }
         try {
@@ -190,7 +192,7 @@ const VendorNewOrder = () => {
             if (error.response?.data?.invoiceId) {
                 navigate(`/vendor/invoice/${error.response.data.invoiceId}`);
             } else {
-                alert("Failed to create invoice.");
+                showNotice({ title: 'Invoice could not be created', description: 'Please try again in a moment.' });
             }
         }
     };
@@ -200,9 +202,9 @@ const VendorNewOrder = () => {
         // Mock Coupon Logic
         if (couponCode === 'WELCOME10') {
             setDiscount(subtotal * 0.10); // 10% off
-            alert("Coupon Applied: 10% Discount");
+            showNotice({ title: 'Coupon applied', description: 'WELCOME10 applied a 10% discount to this order.' });
         } else {
-            alert("Invalid Coupon Code");
+            showNotice({ title: 'Coupon not recognised', description: 'Check the coupon code and try again.' });
         }
     };
 
@@ -212,18 +214,18 @@ const VendorNewOrder = () => {
 
     const handleSend = async () => {
         if (!createdOrderId) {
-            alert("Please save the order as a draft first (Save to Register).");
+            showNotice({ title: 'Save a draft first', description: 'Save this order to the register before sending a quotation.' });
             return;
         }
         try {
             const res = await api.post(`/orders/${createdOrderId}/send`);
             if (res.data.success) {
                 setStatus('Quotation Sent');
-                alert("Quotation sent successfully!");
+                showNotice({ title: 'Quotation sent', description: 'The quotation was sent successfully.' });
             }
         } catch (error) {
             console.error("Send Error", error);
-            alert("Failed to send quotation.");
+            showNotice({ title: 'Quotation could not be sent', description: 'Please try again in a moment.' });
         }
     };
 
@@ -397,8 +399,13 @@ const VendorNewOrder = () => {
 
                     <div className="bottom-actions-row no-print">
                         <button className="link-action-blue" onClick={handleAddItem}>Add a Product</button>
-                        <button className="link-action-blue" onClick={() => {
-                            const newNote = prompt("Add a note:");
+                        <button className="link-action-blue" onClick={async () => {
+                            const newNote = await showPrompt({
+                                title: 'Add an order note',
+                                description: 'Keep a clear internal note with this rental order.',
+                                label: 'Note',
+                                placeholder: 'Write a note for this order…',
+                            });
                             if (newNote) setNote(note ? note + "\n" + newNote : newNote);
                         }}>Add a note</button>
                     </div>

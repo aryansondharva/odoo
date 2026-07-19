@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useDialog } from '../context/DialogContext';
 import RentalPeriodSelector from '../components/RentalPeriodSelector';
 import AvailabilityChecker from '../components/AvailabilityChecker';
 import api from '../api/client';
@@ -16,6 +17,7 @@ const ProductDetail = () => {
     const { user, logout } = useAuth();
     const { addToCart, getCartCount } = useCart();
     const { wishlist, toggleWishlist, isInWishlist } = useWishlist();
+    const { showConfirm, showNotice } = useDialog();
 
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -118,9 +120,15 @@ const ProductDetail = () => {
         setAddLoading(false);
         if (result.success) {
             if (showModal) setShowModal(false);
-            if (window.confirm('Item added to cart. Go to cart?')) navigate('/cart');
+            const goToCart = await showConfirm({
+                title: 'Added to your cart',
+                description: 'Your rental item has been added. Would you like to review your cart now?',
+                confirmLabel: 'Go to cart',
+                cancelLabel: 'Keep browsing',
+            });
+            if (goToCart) navigate('/cart');
         } else {
-            alert(result.message || 'Failed to add to cart');
+            showNotice({ title: 'Could not add to cart', description: result.message || 'Please try again.' });
         }
     };
 

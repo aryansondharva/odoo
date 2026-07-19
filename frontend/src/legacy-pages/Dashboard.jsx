@@ -5,11 +5,13 @@ import { useCart } from '../context/CartContext';
 import { useSearch } from '../context/SearchContext';
 import { useWishlist } from '../context/WishlistContext';
 import api from '../api/client';
+import { useDialog } from '../context/DialogContext';
 import './Dashboard.css';
 
 const DURATION_LABELS = { HOUR: 'Hour', DAY: 'Day', WEEK: 'Week', MONTH: 'Month', YEAR: 'Year' };
 
 const Dashboard = () => {
+    const { showNotice } = useDialog();
     const { user, logout } = useAuth();
     const { getCartCount } = useCart();
     const { searchQuery, setSearchQuery } = useSearch();
@@ -242,7 +244,7 @@ const Dashboard = () => {
                                                 <button
                                                     className="btn btn-primary"
                                                     style={{ opacity: 0.6, cursor: 'not-allowed' }}
-                                                    onClick={() => alert('Sorry, this product is currently out of stock.')}
+                                                    onClick={() => showNotice({ title: 'Currently out of stock', description: 'This product is unavailable right now. Please check back later or browse similar rentals.' })}
                                                 >
                                                     Rent Now
                                                 </button>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useDialog } from '../context/DialogContext';
 import './Cart.css';
 
 const Cart = () => {
@@ -22,6 +23,7 @@ const Cart = () => {
         setRentalPeriod,
     } = useCart();
     const { wishlist } = useWishlist();
+    const { showConfirm } = useDialog();
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [couponCode, setCouponCode] = useState('');
@@ -37,8 +39,14 @@ const Cart = () => {
     };
     const toggleUserDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-    const handleRemoveItem = (id) => {
-        if (window.confirm('Remove this item from cart?')) {
+    const handleRemoveItem = async (id) => {
+        const confirmed = await showConfirm({
+            title: 'Remove item from cart',
+            description: 'This rental item will be removed from your cart.',
+            confirmLabel: 'Remove item',
+            tone: 'danger',
+        });
+        if (confirmed) {
             removeFromCart(id);
         }
     };

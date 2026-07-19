@@ -6,6 +6,7 @@ import { useWishlist } from '../../context/WishlistContext';
 import api from '../../api/client';
 import OrderStatusBadge from '../../components/OrderStatusBadge';
 import PricingBreakdown from '../../components/PricingBreakdown';
+import { useDialog } from '../../context/DialogContext';
 import '../Dashboard.css';
 import './CustomerOrderDetail.css';
 
@@ -20,6 +21,7 @@ const CustomerOrderDetail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [renterProtectionAccepted, setRenterProtectionAccepted] = useState(false);
+    const { showConfirm, showNotice } = useDialog();
 
     const displayName = user?.name || 'User';
     const email = user?.email || 'user@example.com';
@@ -53,19 +55,24 @@ const CustomerOrderDetail = () => {
 
     const handleConfirmOrder = async () => {
         if (!renterProtectionAccepted) {
-            alert('Please accept the rental protection terms before confirming.');
+            showNotice({ title: 'Rental protection required', description: 'Please accept the rental protection terms before confirming this order.' });
             return;
         }
-        if (!window.confirm('Confirm this order? The rental price shown will be locked and the items reserved.')) return;
+        const confirmed = await showConfirm({
+            title: 'Confirm rental order',
+            description: 'The rental price shown will be locked and the selected items will be reserved.',
+            confirmLabel: 'Confirm order',
+        });
+        if (!confirmed) return;
 
         try {
             const response = await api.post(`/orders/${id}/confirm`, { renterProtectionAccepted: true });
             if (response.data.success) {
-                alert('Order confirmed successfully!');
+                showNotice({ title: 'Order confirmed', description: 'Your rental is confirmed and the selected items are now reserved.' });
                 fetchOrderDetail();
             }
         } catch (err) {
-            alert(err.response?.data?.message || 'Failed to confirm order');
+            showNotice({ title: 'Order could not be confirmed', description: err.response?.data?.message || 'Please try again in a moment.' });
         }
     };
 

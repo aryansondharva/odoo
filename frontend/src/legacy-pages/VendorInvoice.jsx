@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import { useDialog } from '../context/DialogContext';
 import './VendorInvoice.css';
 
 const VendorInvoice = () => {
+    const { showConfirm, showNotice } = useDialog();
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const { id } = useParams();
@@ -37,15 +39,21 @@ const VendorInvoice = () => {
     };
 
     const handleVoid = async () => {
-        if (!window.confirm("Are you sure you want to void this invoice?")) return;
+        const confirmed = await showConfirm({
+            title: 'Void invoice',
+            description: 'This invoice will be marked as void and can no longer be used for payment.',
+            confirmLabel: 'Void invoice',
+            tone: 'danger',
+        });
+        if (!confirmed) return;
         try {
             const res = await api.patch(`/invoice/${invoice.id}/void`);
             if (res.data.success) {
                 setInvoice(prev => ({ ...prev, status: 'VOID' }));
-                alert("Invoice Voided.");
+                showNotice({ title: 'Invoice voided', description: 'The invoice status has been updated.' });
             }
         } catch (err) {
-            alert("Failed to void invoice.");
+            showNotice({ title: 'Invoice could not be voided', description: 'Please try again in a moment.' });
         }
     };
 

@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
+import { useDialog } from '../context/DialogContext';
 import './VendorSettings.css';
 
 const VendorSettings = () => {
+    const { showNotice } = useDialog();
     const { user, logout, updateUser } = useAuth();
     const navigate = useNavigate();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -71,12 +73,12 @@ const VendorSettings = () => {
                     address: profile.address
                 });
 
-                alert("Settings saved successfully!");
+                showNotice({ title: 'Settings saved', description: 'Your profile and business details have been updated.' });
                 navigate('/vendor/dashboard');
             }
         } catch (error) {
             console.error("Save Error", error);
-            alert("Failed to save settings: " + (error.response?.data?.message || error.message));
+            showNotice({ title: 'Settings could not be saved', description: error.response?.data?.message || error.message || 'Please try again.' });
         }
     };
 
@@ -99,7 +101,7 @@ const VendorSettings = () => {
 
     const handleUpdatePassword = async () => {
         if (!passwords.currentPassword || !passwords.newPassword) {
-            alert("Please fill in both current and new password fields.");
+            showNotice({ title: 'Password details required', description: 'Fill in both the current and new password fields.' });
             return;
         }
 
@@ -107,12 +109,12 @@ const VendorSettings = () => {
             // Note: Route is /api/users/password based on app.js mounting
             const res = await api.put('/users/password', passwords);
             if (res.data.success) {
-                alert("Password updated successfully!");
+                showNotice({ title: 'Password updated', description: 'Your password has been updated successfully.' });
                 setPasswords({ currentPassword: '', newPassword: '' });
             }
         } catch (error) {
             console.error("Password Update Error", error);
-            alert(error.response?.data?.message || "Failed to update password.");
+            showNotice({ title: 'Password could not be updated', description: error.response?.data?.message || 'Please try again in a moment.' });
         }
     };
 
