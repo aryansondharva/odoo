@@ -163,8 +163,8 @@ const VendorDashboard = () => {
                 <div className="vendor-revenue-section">
                     <div className="vendor-revenue-card">
                         <div className="vendor-revenue-label">Total Revenue This Month</div>
-                        <div className="vendor-revenue-value">${stats.revenue.toLocaleString()}</div>
-                        <div className="vendor-revenue-change">↑ 23% from last month</div>
+                        <div className="vendor-revenue-value">₹{stats.revenue.toLocaleString()}</div>
+                        <div className="vendor-revenue-change">{stats.revenue > 0 ? "Real-time accumulated earnings" : "No earnings yet this month"}</div>
                     </div>
 
                     <div className="vendor-stats-mini">
@@ -212,11 +212,20 @@ const VendorDashboard = () => {
                             {filteredProducts.map((p) => (
                                 <tr key={p.id}>
                                     <td>
-                                        <div className="vendor-product-name">{p.name}</div>
-                                        <div className="vendor-product-category">{p.brand}</div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                            <img 
+                                                src={p.imageUrl ? (p.imageUrl.startsWith('/') ? `http://localhost:5000${p.imageUrl}` : p.imageUrl) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Crect fill='%23252b4a' width='36' height='36'/%3E%3Ctext x='50%25' y='50%25' font-size='16' fill='%239ca3af' text-anchor='middle' dy='.3em'%3E📦%3C/text%3E%3C/svg%3E"} 
+                                                alt={p.name} 
+                                                style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border)' }}
+                                            />
+                                            <div>
+                                                <div className="vendor-product-name">{p.name}</div>
+                                                <div className="vendor-product-category">{p.brand}</div>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>{p.category}</td>
-                                    <td className="vendor-price">${Number(p.price).toFixed(2)}</td>
+                                    <td className="vendor-price">₹{Number(p.price).toFixed(2)}</td>
                                     <td>{p.stock} units</td>
                                     <td>
                                         <span className={`vendor-stock-badge ${getStockClass(p.stock)}`}>
@@ -252,7 +261,7 @@ const VendorDashboard = () => {
                                     {order.items?.length || 0} items • {new Date(order.createdAt).toLocaleDateString()}
                                 </p>
                             </div>
-                            <div className="vendor-order-amount">${Number(order.totalAmount).toLocaleString()}</div>
+                            <div className="vendor-order-amount">₹{Number(order.totalAmount).toLocaleString()}</div>
                             <span className={`vendor-order-status ${getOrderStatusClass(order.status)}`}>
                                 {getOrderStatusLabel(order.status)}
                             </span>

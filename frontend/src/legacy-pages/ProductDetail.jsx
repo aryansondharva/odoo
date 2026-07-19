@@ -146,7 +146,7 @@ const ProductDetail = () => {
         );
     }
 
-    const priceLabel = `R${product.price} / ${DURATION_LABELS[product.durationType] || product.durationType?.toLowerCase()}`;
+    const priceLabel = `₹${product.price} / ${DURATION_LABELS[product.durationType] || product.durationType?.toLowerCase()}`;
 
     return (
         <div className="product-detail-page">
@@ -186,7 +186,7 @@ const ProductDetail = () => {
                     </div>
                 </div>
             </nav>
-
+ 
             <div className="breadcrumb">
                 <Link to="/dashboard">All Product</Link> / <span>{product.name}</span>
             </div>
@@ -195,12 +195,18 @@ const ProductDetail = () => {
             <div className="main-content">
                 <div className="product-gallery">
                     <div className="main-image">
-                        <img src={product.imageUrl || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='450'%3E%3Crect fill='%23252b4a' width='600' height='450'/%3E%3Ctext x='50%25' y='50%25' font-size='80' fill='%239ca3af' text-anchor='middle' dy='.3em'%3E📦%3C/text%3E%3C/svg%3E"} alt={product.name} />
+                        <img src={product.imageUrl ? (product.imageUrl.startsWith('/') ? `http://localhost:5000${product.imageUrl}` : product.imageUrl) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='450'%3E%3Crect fill='%23252b4a' width='600' height='450'/%3E%3Ctext x='50%25' y='50%25' font-size='80' fill='%239ca3af' text-anchor='middle' dy='.3em'%3E📦%3C/text%3E%3C/svg%3E"} alt={product.name} />
                     </div>
                 </div>
                 <div className="product-info">
                     <div>
+                        <div className="product-category-brand" style={{ fontSize: '0.85rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
+                            {product.brand} · {product.category}
+                        </div>
                         <h1 className="product-title">{product.name}</h1>
+                        <div className="product-vendor" style={{ fontSize: '0.9rem', color: '#625e58', margin: '0.5rem 0' }}>
+                            Vendor: <span style={{ fontWeight: 600 }}>{product.vendorName || 'Unknown Vendor'}</span>
+                        </div>
                         <div className="product-price">{priceLabel}</div>
                         <p className="price-subtitle">Price per {DURATION_LABELS[product.durationType]?.toLowerCase() || product.durationType?.toLowerCase()}</p>
                         {product.description && <p className="price-subtitle" style={{ marginTop: '0.5rem' }}>{product.description}</p>}

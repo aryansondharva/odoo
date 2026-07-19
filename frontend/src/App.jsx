@@ -76,7 +76,7 @@ function App() {
                         <div className="w-full min-h-screen bg-gray-50 flex flex-col">
                             <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
                                 <Routes>
-                                    <Route path="/" element={<Login />} />
+                                    <Route path="/" element={<Index />} />
                                     <Route path="/login" element={<Login />} />
                                     <Route path="/signup" element={<Signup />} />
                                     <Route path="/forgot-password" element={<ForgotPassword />} />

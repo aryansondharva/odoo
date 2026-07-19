@@ -38,7 +38,7 @@ async function listProducts(filters = {}) {
 
     const products = await prisma.product.findMany({
         where,
-        include: { variants: true },
+        include: { variants: true, vendor: { select: { name: true, companyName: true } } },
         orderBy: { createdAt: 'desc' },
     });
 
@@ -57,6 +57,7 @@ async function listProducts(filters = {}) {
         isPublished: p.isPublished, // Added to fix 'always unpublished' issue
         createdAt: p.createdAt,
         variants: p.variants.map((v) => ({ id: v.id, optionName: v.optionName, optionValue: v.optionValue })),
+        vendorName: p.vendor?.companyName || p.vendor?.name || 'Unknown Vendor',
     }));
 }
 
@@ -67,7 +68,7 @@ async function getProductById(id) {
     if (!id) return null;
     const product = await prisma.product.findUnique({
         where: { id },
-        include: { variants: true },
+        include: { variants: true, vendor: { select: { name: true, companyName: true } } },
     });
     if (!product) return null;
     return {
@@ -83,6 +84,7 @@ async function getProductById(id) {
         imageUrl: product.imageUrl,
         createdAt: product.createdAt,
         variants: product.variants.map((v) => ({ id: v.id, optionName: v.optionName, optionValue: v.optionValue })),
+        vendorName: product.vendor?.companyName || product.vendor?.name || 'Unknown Vendor',
     };
 }
 

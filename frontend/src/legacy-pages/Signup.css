@@ -623,3 +623,179 @@
         margin-bottom: 1.25rem;
     }
 }
+
+/* Dashboard-gray sign-up theme. */
+.signup-body {
+    --primary: #0e141b;
+    --accent: #62c9e8;
+    --accent-warm: #f0b35c;
+    --surface: #18212c;
+    --surface-light: #222e3b;
+    --text: #f4f7fa;
+    --text-muted: #a9b6c5;
+    --border: #354554;
+    background: #0e141b;
+    color: var(--text);
+}
+
+.signup-body .bg-pattern,
+.signup-body .showcase-ribbon,
+.signup-body .showcase-orb {
+    display: none;
+}
+
+.signup-body .register-container {
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.32);
+}
+
+.signup-body .register-card {
+    border: 1px solid var(--border);
+    border-radius: 8px 0 0 8px;
+    background: var(--surface);
+    box-shadow: none;
+}
+
+.signup-body .register-card::before {
+    height: 2px;
+    background: var(--accent);
+}
+
+.signup-body .signup-showcase {
+    border: 1px solid var(--border);
+    border-left: 0;
+    border-radius: 0 8px 8px 0;
+    background: #152334;
+    box-shadow: none;
+}
+
+.signup-body .logo,
+.signup-body h1,
+.signup-body .role-title,
+.signup-body label {
+    color: var(--text);
+}
+
+.signup-body .subtitle,
+.signup-body .role-desc,
+.signup-body .password-requirements,
+.signup-body .login-link,
+.signup-body .back-home a,
+.signup-body .showcase-note-card span {
+    color: var(--text-muted);
+}
+
+.signup-body .role-card,
+.signup-body input,
+.signup-body select {
+    border-color: var(--border);
+    border-radius: 6px;
+    background: var(--surface-light);
+    color: var(--text);
+}
+
+.signup-body .role-card:hover,
+.signup-body .role-card.active {
+    border-color: var(--accent);
+    background: #1b2a39;
+    box-shadow: none;
+    transform: none;
+}
+
+.signup-body input:focus,
+.signup-body select:focus {
+    border-color: var(--accent);
+    background: #111923;
+    box-shadow: 0 0 0 3px rgba(98, 201, 232, 0.16);
+}
+
+.signup-body .btn {
+    border-radius: 6px;
+    background: var(--accent);
+    color: #0e141b;
+    box-shadow: none;
+}
+
+.signup-body .btn:hover {
+    background: #92dff3;
+    box-shadow: none;
+    transform: none;
+}
+
+.signup-body .signup-showcase h2,
+.signup-body .signup-showcase p {
+    color: var(--text);
+}
+
+.signup-body .showcase-kicker {
+    border-color: var(--border);
+    border-radius: 999px;
+    color: var(--accent);
+}
+
+.signup-body .showcase-stat-card,
+.signup-body .showcase-note-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: none;
+    transform: none;
+}
+
+.signup-body .stat-card-label,
+.signup-body .note-icon {
+    color: var(--accent);
+}
+
+.signup-body .note-icon {
+    background: #1b2a39;
+}
+
+.signup-body .stat-bars span,
+.signup-body .stat-bars span:nth-child(1),
+.signup-body .stat-bars span:nth-child(2),
+.signup-body .stat-bars span:nth-child(3),
+.signup-body .stat-bars span:nth-child(4) {
+    background: var(--accent);
+}
+
+.signup-body .role-icon,
+.signup-body .role-icon-customer span,
+.signup-body .role-icon-vendor span,
+.signup-body .role-icon-vendor::after {
+    border-color: var(--accent);
+    background-color: transparent;
+}
+
+.signup-body .role-icon-customer::after {
+    background: var(--accent);
+    box-shadow: 12px 0 var(--accent);
+}
+
+.signup-body .role-icon-vendor::before {
+    background: var(--accent);
+}
+
+.signup-body .server-error {
+    border-color: #a73d4b;
+    background: rgba(243, 122, 136, 0.12);
+    color: #ffabb6;
+}
+
+@media (max-width: 768px) {
+    .signup-body .register-card {
+        border-radius: 8px 8px 0 0;
+    }
+
+    .signup-body .signup-showcase {
+        border-top: 0;
+        border-left: 1px solid var(--border);
+        border-radius: 0 0 8px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .signup-body .register-card {
+        border-radius: 8px;
+    }
+}

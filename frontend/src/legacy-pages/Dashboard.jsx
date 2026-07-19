@@ -204,7 +204,7 @@ const Dashboard = () => {
                             {filteredProducts.map((product) => (
                                 <div key={product.id} className="product-card">
                                     <div className="product-image">
-                                        <img src={product.imageUrl || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23252b4a' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' font-size='48' fill='%239ca3af' text-anchor='middle' dy='.3em'%3E📦%3C/text%3E%3C/svg%3E"} alt={product.name} />
+                                        <img src={product.imageUrl ? (product.imageUrl.startsWith('/') ? `http://localhost:5000${product.imageUrl}` : product.imageUrl) : "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200'%3E%3Crect fill='%23252b4a' width='300' height='200'/%3E%3Ctext x='50%25' y='50%25' font-size='48' fill='%239ca3af' text-anchor='middle' dy='.3em'%3E📦%3C/text%3E%3C/svg%3E"} alt={product.name} />
                                         {product.stock === 0 && (
                                             <div className="out-of-stock-overlay">OUT OF STOCK</div>
                                         )}
@@ -231,11 +231,22 @@ const Dashboard = () => {
                                         </button>
                                     </div>
                                     <div className="product-info">
-                                        <div className="product-name">{product.name}</div>
-                                        <div className="product-price">
-                                            <span className="price-label">R{product.price} / {DURATION_LABELS[product.durationType] || product.durationType?.toLowerCase()}</span>
+                                        <div className="product-category-brand" style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>
+                                            {product.brand} · {product.category}
                                         </div>
-                                        <div className="product-actions">
+                                        <div className="product-name">{product.name}</div>
+                                        <div className="product-vendor" style={{ fontSize: '0.8rem', color: '#625e58', margin: '0.25rem 0' }}>
+                                            Vendor: <span style={{ fontWeight: 600 }}>{product.vendorName || 'Unknown Vendor'}</span>
+                                        </div>
+                                        {product.description && (
+                                            <div className="product-desc" style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', margin: '0.35rem 0 0.75rem', lineHeight: '1.4' }}>
+                                                {product.description}
+                                            </div>
+                                        )}
+                                        <div className="product-price" style={{ marginTop: '0.5rem' }}>
+                                            <span className="price-label">₹{product.price} / {DURATION_LABELS[product.durationType] || product.durationType?.toLowerCase()}</span>
+                                        </div>
+                                        <div className="product-actions" style={{ marginTop: '1rem' }}>
                                             {product.stock > 0 ? (
                                                 <button className="btn btn-primary" onClick={() => navigate(`/product/${product.id}`)}>Rent Now</button>
                                             ) : (

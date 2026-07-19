@@ -712,8 +712,8 @@ body {
 .dashboard-page .logo-icon { width: 28px; height: 28px; background: #111; border-radius: 50%; font-size: 0; }
 .dashboard-page .nav-link { padding: .3rem .15rem; border-radius: 0; color: #65615c; font-size: .82rem; font-weight: 750; }
 .dashboard-page .nav-link.active, .dashboard-page .nav-link:hover { color: #111; background: transparent; box-shadow: inset 0 -2px #111; }
-.dashboard-page .search-input { padding: .7rem 1rem; background: transparent; border: 1px solid var(--border); border-radius: 0; color: #111; }
-.dashboard-page .search-btn { display: none; }
+.dashboard-page .search-input { padding: .7rem 2.5rem .7rem 1rem; background: #ffffff; border: 1px solid #77736e; border-radius: 6px; color: #111; font-weight: 500; }
+.dashboard-page .search-btn { display: block; background: transparent; border: none; font-size: 1rem; right: 10px; cursor: pointer; }
 .dashboard-page .icon-btn, .dashboard-page .user-profile-btn { background: transparent; border: 1px solid var(--border); border-radius: 999px; color: #111; }
 .dashboard-page .icon-btn { width: 36px; height: 36px; font-size: .9rem; }
 .dashboard-page .user-profile-btn { padding: .3rem .55rem; }

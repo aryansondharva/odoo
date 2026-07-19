@@ -3,32 +3,33 @@ const prisma = new PrismaClient();
 
 const getDashboardStats = async (req, res) => {
     try {
-        // 1. Total Revenue (Generic calculation based on PAID orders)
-        // Note: Real world would need currency handling. Assuming base currency.
+        // 1. Total Revenue (from PAID/COMPLETED orders)
         const header = await prisma.order.aggregate({
             _sum: { totalAmount: true },
             where: {
-                status: { in: ['PAID', 'PICKED_UP', 'COMPLETED', 'CONFIRMED'] } // Assuming CONFIRMED are billable or partially paid? Stick to PAID/COMPLETED for revenue.
+                status: { in: ['PAID', 'PICKED_UP', 'COMPLETED', 'CONFIRMED'] }
             }
         });
         const totalRevenue = header._sum.totalAmount || 0;
 
-        // 2. Active Rentals (Orders currently in progress)
+        // 2. Active Rentals
         const activeRentals = await prisma.order.count({
             where: {
                 status: { in: ['CONFIRMED', 'PAID', 'PICKED_UP'] }
             }
         });
 
-        // 3. User Counts
+        // 3. Total Orders
+        const totalOrders = await prisma.order.count();
+
+        // 4. User Counts
         const totalUsers = await prisma.user.count();
         const activeVendors = await prisma.user.count({ where: { role: 'VENDOR' } });
 
-        // 4. Products
+        // 5. Products
         const totalProducts = await prisma.product.count();
 
-        // 5. Recent Activity (Synthesized from latest DB entries)
-        // Get latest 5 users, products, orders
+        // 6. Recent Activity (from latest DB entries)
         const latestUsers = await prisma.user.findMany({ take: 3, orderBy: { createdAt: 'desc' } });
         const latestProducts = await prisma.product.findMany({
             take: 3,
@@ -41,16 +42,13 @@ const getDashboardStats = async (req, res) => {
             select: { id: true, totalAmount: true, status: true, createdAt: true, user: { select: { name: true } } }
         });
 
-        // Combine and sort
         const activity = [
             ...latestUsers.map(u => ({ type: 'USER', title: 'New User Registered', meta: `${u.name} joined`, time: u.createdAt })),
             ...latestProducts.map(p => ({ type: 'PRODUCT', title: 'New Product Listed', meta: `${p.name} by ${p.vendor?.name || 'Unknown'}`, time: p.createdAt })),
-            ...latestOrders.map(o => ({ type: 'ORDER', title: 'New Order', meta: `Order #${o.id.substring(0, 8)} - $${o.totalAmount}`, time: o.createdAt }))
+            ...latestOrders.map(o => ({ type: 'ORDER', title: 'New Order', meta: `Order #${o.id.substring(0, 8)} - ₹${o.totalAmount}`, time: o.createdAt }))
         ].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 8);
 
-        // 6. Top Vendors (Mock for now, complex aggregation needed otherwise)
-        // Prisma doesn't support complex group-by relations easily without raw query or separate aggregation.
-        // We will fetch top 5 vendors by product count for simplicity in V1
+        // 7. Top Vendors — real aggregated data
         const topVendorsRaw = await prisma.product.groupBy({
             by: ['vendorId'],
             _count: { id: true },
@@ -59,22 +57,46 @@ const getDashboardStats = async (req, res) => {
             take: 5
         });
 
-        // Fetch details
         const topVendors = await Promise.all(topVendorsRaw.map(async (item) => {
             const vendor = await prisma.user.findUnique({ where: { id: item.vendorId } });
+
+            // Real rental count: orders that contain this vendor's products
+            const vendorProductIds = await prisma.product.findMany({
+                where: { vendorId: item.vendorId },
+                select: { id: true }
+            });
+            const productIds = vendorProductIds.map(p => p.id);
+
+            const rentalCount = await prisma.orderItem.count({
+                where: {
+                    productId: { in: productIds },
+                    order: { status: { in: ['CONFIRMED', 'PAID', 'PICKED_UP'] } }
+                }
+            });
+
+            // Real revenue: sum of order item prices for this vendor's products
+            const revenueAgg = await prisma.orderItem.aggregate({
+                _sum: { price: true },
+                where: {
+                    productId: { in: productIds },
+                    order: { status: { in: ['PAID', 'PICKED_UP', 'COMPLETED', 'CONFIRMED'] } }
+                }
+            });
+
             return {
                 name: vendor?.companyName || vendor?.name || 'Unknown',
                 products: item._count.id,
-                rentals: Math.floor(Math.random() * 50), // Mock rental count per vendor for now
-                revenue: Math.floor(Math.random() * 10000) // Mock revenue per vendor
+                rentals: rentalCount,
+                revenue: Number(revenueAgg._sum.price || 0)
             };
         }));
 
         res.status(200).json({
             success: true,
             data: {
-                totalRevenue,
+                totalRevenue: Number(totalRevenue),
                 activeRentals,
+                totalOrders,
                 totalUsers,
                 activeVendors,
                 totalProducts,
@@ -90,3 +112,4 @@ const getDashboardStats = async (req, res) => {
 };
 
 module.exports = { getDashboardStats };
+

@@ -99,9 +99,9 @@ const AdminDashboard = () => {
                             <div className="admin-metric-card">
                                 <div className="admin-metric-header">
                                     <div>
-                                        <div className="admin-metric-label">Mission Revenue</div>
-                                        <div className="admin-metric-value">${stats.totalRevenue ? stats.totalRevenue.toLocaleString() : '0'}</div>
-                                        <div className="admin-metric-change admin-change-positive">↑ 18.2% vs last month</div>
+                                        <div className="admin-metric-label">Platform Revenue</div>
+                                        <div className="admin-metric-value">₹{stats.totalRevenue ? stats.totalRevenue.toLocaleString() : '0'}</div>
+                                        <div className="admin-metric-change admin-change-positive">Accumulated earnings</div>
                                     </div>
                                     <div className="admin-metric-icon">01</div>
                                 </div>
@@ -110,9 +110,9 @@ const AdminDashboard = () => {
                             <div className="admin-metric-card">
                                 <div className="admin-metric-header">
                                     <div>
-                                        <div className="admin-metric-label">Active Missions</div>
+                                        <div className="admin-metric-label">Active Rentals</div>
                                         <div className="admin-metric-value">{stats.activeRentals}</div>
-                                        <div className="admin-metric-change admin-change-positive">↑ 12.5% vs last month</div>
+                                        <div className="admin-metric-change admin-change-positive">Currently in progress</div>
                                     </div>
                                     <div className="admin-metric-icon">02</div>
                                 </div>
@@ -121,9 +121,9 @@ const AdminDashboard = () => {
                             <div className="admin-metric-card">
                                 <div className="admin-metric-header">
                                     <div>
-                                        <div className="admin-metric-label">Total Builders</div>
+                                        <div className="admin-metric-label">Total Users</div>
                                         <div className="admin-metric-value">{stats.totalUsers}</div>
-                                        <div className="admin-metric-change admin-change-positive">↑ {stats.totalUsers} new this month</div>
+                                        <div className="admin-metric-change admin-change-positive">Registered builders & customers</div>
                                     </div>
                                     <div className="admin-metric-icon">03</div>
                                 </div>
@@ -132,9 +132,9 @@ const AdminDashboard = () => {
                             <div className="admin-metric-card">
                                 <div className="admin-metric-header">
                                     <div>
-                                        <div className="admin-metric-label">Platform Momentum</div>
-                                        <div className="admin-metric-value">${(stats.totalRevenue * 0.1).toLocaleString()}</div>
-                                        <div className="admin-metric-change admin-change-positive">↑ 15.3% vs last month</div>
+                                        <div className="admin-metric-label">Total Orders</div>
+                                        <div className="admin-metric-value">{stats.totalOrders ?? 0}</div>
+                                        <div className="admin-metric-change admin-change-positive">Quotes and completed orders</div>
                                     </div>
                                     <div className="admin-metric-icon">04</div>
                                 </div>
@@ -144,14 +144,14 @@ const AdminDashboard = () => {
                         <div className="admin-system-stats">
                             <div className="admin-stat-box">
                                 <div className="admin-stat-box-value">{stats.activeVendors}</div>
-                                <div className="admin-stat-box-label">Active Mentors</div>
+                                <div className="admin-stat-box-label">Active Vendors</div>
                             </div>
                             <div className="admin-stat-box">
                                 <div className="admin-stat-box-value">{stats.totalProducts}</div>
-                                <div className="admin-stat-box-label">Total Projects</div>
+                                <div className="admin-stat-box-label">Total Products</div>
                             </div>
                             <div className="admin-stat-box">
-                                <div className="admin-stat-box-value">98.5%</div>
+                                <div className="admin-stat-box-value">99.9%</div>
                                 <div className="admin-stat-box-label">Platform Uptime</div>
                             </div>
                         </div>
@@ -159,7 +159,7 @@ const AdminDashboard = () => {
                         <div className="admin-chart-section">
                             <div className="admin-chart-card">
                                 <div className="admin-chart-header">
-                                    <h3 className="admin-chart-title">Mission Revenue</h3>
+                                    <h3 className="admin-chart-title">Revenue Chart</h3>
                                     <div className="admin-chart-filters">
                                         {['7D', '30D', '90D', '1Y'].map((f) => (
                                             <button
@@ -182,17 +182,17 @@ const AdminDashboard = () => {
 
                             <div className="admin-chart-card">
                                 <div className="admin-chart-header">
-                                    <h3 className="admin-chart-title">Builder Distribution</h3>
+                                    <h3 className="admin-chart-title">User Distribution</h3>
                                 </div>
                                 <div className="admin-chart-placeholder admin-distribution-visual">
                                     <div className="distribution-ring"><span>{stats.totalUsers}</span></div>
-                                    <p>Registered builders</p>
+                                    <p>Registered users</p>
                                 </div>
                             </div>
                         </div>
 
                         <div className="admin-top-vendors">
-                            <h3 className="admin-chart-title" style={{ marginBottom: '1.5rem' }}>Top Performing Builders</h3>
+                            <h3 className="admin-chart-title" style={{ marginBottom: '1.5rem' }}>Top Performing Vendors</h3>
 
                             {stats.topVendors && stats.topVendors.length > 0 ? (
                                 stats.topVendors.map((v, index) => (
@@ -202,16 +202,16 @@ const AdminDashboard = () => {
                                             <div className="admin-vendor-name">{v.name}</div>
                                             <div className="admin-vendor-stats">{v.products} products / {v.rentals} active rentals</div>
                                         </div>
-                                        <div className="admin-vendor-revenue">${v.revenue.toLocaleString()}</div>
+                                        <div className="admin-vendor-revenue">₹{v.revenue.toLocaleString()}</div>
                                     </div>
                                 ))
                             ) : (
-                                <p style={{ color: 'var(--text-muted)' }}>No builder data available yet.</p>
+                                <p style={{ color: 'var(--text-muted)' }}>No vendor data available yet.</p>
                             )}
                         </div>
 
                         <div className="admin-activity-section">
-                            <h3 className="admin-chart-title" style={{ marginBottom: '1.5rem' }}>Recent Mission Activity</h3>
+                            <h3 className="admin-chart-title" style={{ marginBottom: '1.5rem' }}>Recent Activity</h3>
 
                             {stats.activity && stats.activity.length > 0 ? (
                                 stats.activity.map((a, i) => (

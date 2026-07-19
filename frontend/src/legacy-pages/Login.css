@@ -385,3 +385,107 @@
     padding: 1rem;
   }
 }
+
+/* Dashboard-gray auth theme. Shared by login, reset, recovery, and verification. */
+.login-page {
+  --primary: #0e141b;
+  --accent: #62c9e8;
+  --accent-warm: #f0b35c;
+  --surface: #18212c;
+  --surface-light: #222e3b;
+  --text: #f4f7fa;
+  --text-muted: #a9b6c5;
+  --border: #354554;
+  --success: #55c694;
+  --error: #f37a88;
+  background: var(--primary);
+}
+
+.login-bg-pattern,
+.login-bg-pattern::before {
+  display: none;
+}
+
+.login-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.32);
+}
+
+.login-card::before {
+  height: 2px;
+  background: var(--accent);
+}
+
+.login-logo {
+  background: none;
+  color: var(--text);
+  -webkit-text-fill-color: currentColor;
+}
+
+.login-logo-subtitle,
+.login-subtitle,
+.login-checkbox-wrapper label,
+.login-signup-link,
+.login-back-home a {
+  color: var(--text-muted);
+}
+
+.login-page h1,
+.login-form-group label {
+  color: var(--text);
+}
+
+.login-input {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-light);
+  color: var(--text);
+}
+
+.login-input:focus {
+  border-color: var(--accent);
+  background: #111923;
+  box-shadow: 0 0 0 3px rgba(98, 201, 232, 0.16);
+}
+
+.login-btn,
+.login-button {
+  border-radius: 6px;
+  background: var(--accent);
+  color: #0e141b;
+  box-shadow: none;
+}
+
+.login-btn:hover:not(:disabled),
+.login-button:hover:not(:disabled) {
+  background: #92dff3;
+  box-shadow: none;
+  transform: none;
+}
+
+.login-social-btn {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-light);
+  color: var(--text);
+}
+
+.login-social-btn:hover {
+  border-color: var(--accent);
+  background: #111923;
+}
+
+.login-forgot-link,
+.login-signup-link a,
+.login-back-home a:hover,
+.login-password-toggle:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .login-card {
+    border-radius: 8px;
+  }
+}
