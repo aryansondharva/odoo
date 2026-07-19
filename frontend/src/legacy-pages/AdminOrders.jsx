@@ -68,7 +68,8 @@ const AdminOrders = () => {
         QUOTATION: orders.filter(o => o.status === 'QUOTATION').length,
         SALES_ORDER: orders.filter(o => o.status === 'SALES_ORDER').length,
         PAID: orders.filter(o => o.status === 'PAID').length,
-        PICKED_UP: orders.filter(o => o.status === 'PICKED_UP').length,
+        ACTIVE: orders.filter(o => o.status === 'ACTIVE').length,
+        OVERDUE: orders.filter(o => o.status === 'OVERDUE').length,
         RETURNED: orders.filter(o => o.status === 'RETURNED').length
     };
 
@@ -118,7 +119,7 @@ const AdminOrders = () => {
                     paddingBottom: '0.5rem',
                     flexWrap: 'wrap'
                 }}>
-                    {['ALL', 'QUOTATION', 'SALES_ORDER', 'PAID', 'PICKED_UP', 'RETURNED'].map(status => (
+                    {['ALL', 'QUOTATION', 'SALES_ORDER', 'PAID', 'ACTIVE', 'OVERDUE', 'RETURNED'].map(status => (
                         <button
                             key={status}
                             onClick={() => setFilterStatus(status)}

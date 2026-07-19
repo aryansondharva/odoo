@@ -34,6 +34,16 @@ const OrderStatusBadge = ({ status }) => {
                 className: 'status-picked-up',
                 icon: '📦'
             },
+            ACTIVE: {
+                label: 'Active Rental',
+                className: 'status-active',
+                icon: '🚚'
+            },
+            OVERDUE: {
+                label: 'OVERDUE',
+                className: 'status-overdue',
+                icon: '⚠️'
+            },
             RETURNED: {
                 label: 'Returned',
                 className: 'status-returned',

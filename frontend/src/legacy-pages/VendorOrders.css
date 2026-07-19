@@ -446,6 +446,26 @@
     color: #3b82f6;
 }
 
+.vendor-orders-page .status-paid {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+}
+
+.vendor-orders-page .status-active {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+}
+
+.vendor-orders-page .status-overdue {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--danger);
+}
+
+.vendor-orders-page .status-returned {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
 /* List View */
 .vendor-orders-page .list-view {
     display: none;
