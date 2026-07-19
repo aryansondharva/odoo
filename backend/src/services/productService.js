@@ -58,6 +58,7 @@ async function listProducts(filters = {}) {
         createdAt: p.createdAt,
         variants: p.variants.map((v) => ({ id: v.id, optionName: v.optionName, optionValue: v.optionValue })),
         vendorName: p.vendor?.companyName || p.vendor?.name || 'Unknown Vendor',
+        lateFeeRate: Number(p.lateFeeRate || 0),
     }));
 }
 
@@ -85,6 +86,7 @@ async function getProductById(id) {
         createdAt: product.createdAt,
         variants: product.variants.map((v) => ({ id: v.id, optionName: v.optionName, optionValue: v.optionValue })),
         vendorName: product.vendor?.companyName || product.vendor?.name || 'Unknown Vendor',
+        lateFeeRate: Number(product.lateFeeRate || 0),
     };
 }
 
@@ -151,7 +153,8 @@ const createProduct = async (data) => {
             imageUrl: data.imageUrl,
             vendorId: data.vendorId,
             isPublished: data.isPublished,
-            attributes: data.attributes ? data.attributes : undefined
+            attributes: data.attributes ? data.attributes : undefined,
+            lateFeeRate: data.lateFeeRate !== undefined ? data.lateFeeRate : undefined
         }
     });
     return product;
@@ -188,7 +191,8 @@ const updateProduct = async (id, data) => {
             durationType: durationType,
             imageUrl: data.imageUrl,
             isPublished: data.isPublished,
-            attributes: data.attributes ? data.attributes : undefined
+            attributes: data.attributes ? data.attributes : undefined,
+            lateFeeRate: data.lateFeeRate !== undefined ? data.lateFeeRate : undefined
         }
     });
     return updatedProduct;

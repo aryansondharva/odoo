@@ -26,7 +26,8 @@ const VendorProduct = () => {
         costPriceUnit: 'Per Units',
         category: '',
         vendorName: '', // This might be auto-filled from user profile in a real app
-        attributes: [] // [{ name: '', value: '' }]
+        attributes: [], // [{ name: '', value: '' }]
+        lateFeeRate: ''
     });
 
     useEffect(() => {
@@ -52,7 +53,8 @@ const VendorProduct = () => {
                     costPriceUnit: 'Per Units', // default or fetch if saved
                     category: product.category,
                     vendorName: '', // Can be fetched from product.vendor if expanded
-                    attributes: product.attributes || []
+                    attributes: product.attributes || [],
+                    lateFeeRate: product.lateFeeRate || ''
                 });
                 setProductImage(product.imageUrl);
                 setIsPublished(product.isPublished);
@@ -138,6 +140,7 @@ const VendorProduct = () => {
                 price: parseFloat(formData.price) || 0,
                 costPrice: parseFloat(formData.costPrice) || 0,
                 quantityOnHand: parseInt(formData.quantityOnHand) || 0,
+                lateFeeRate: parseFloat(formData.lateFeeRate) || 0,
                 isPublished,
                 imageUrl: productImage // For mock purposes, sending base64. Ideally send file or URL.
             };
@@ -302,7 +305,7 @@ const VendorProduct = () => {
                                     <div className="form-group">
                                         <label className="form-label">Sales Price</label>
                                         <div className="input-with-unit">
-                                            <span className="unit-label">$</span>
+                                            <span className="unit-label">₹</span>
                                             <input
                                                 type="number"
                                                 className="form-input"
@@ -327,9 +330,25 @@ const VendorProduct = () => {
                                     </div>
 
                                     <div className="form-group">
+                                        <label className="form-label">Late Fee Per Day</label>
+                                        <div className="input-with-unit">
+                                            <span className="unit-label">₹</span>
+                                            <input
+                                                type="number"
+                                                className="form-input"
+                                                name="lateFeeRate"
+                                                value={formData.lateFeeRate}
+                                                onChange={handleInputChange}
+                                                placeholder="0.00"
+                                            />
+                                            <span className="form-input" style={{ display: 'flex', alignItems: 'center', background: '#eaeaea', padding: '0 1rem', maxWidth: '150px', borderLeft: 'none', borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}>Per Day</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
                                         <label className="form-label">Cost Price</label>
                                         <div className="input-with-unit">
-                                            <span className="unit-label">$</span>
+                                            <span className="unit-label">₹</span>
                                             <input
                                                 type="number"
                                                 className="form-input"

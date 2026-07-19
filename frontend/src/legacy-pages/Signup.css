@@ -43,13 +43,13 @@
 }
 
 .signup-body .register-container {
-    max-width: 1240px;
+    max-width: 980px;
     margin: 0 auto;
     animation: slideUp 0.6s ease-out;
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(380px, 0.85fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
     align-items: stretch;
 }
 
@@ -434,9 +434,10 @@
 }
 
 .signup-body label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
+    display: block !important;
+    margin-bottom: 0.5rem !important;
+    font-weight: 600 !important;
+    color: #111111 !important;
 }
 
 .signup-body input, .signup-body select {
